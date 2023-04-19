@@ -24,6 +24,7 @@ class Name:
 @dataclass(frozen=True)
 class ProductVersion:
     id: ProductVersionId
+    product_id: ProductId
     name: Name
     description: Description
     price: Price
