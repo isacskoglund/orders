@@ -1,6 +1,7 @@
 from typing import Protocol
 from dataclasses import dataclass
 from models.identifiers import OrderId
+from models.order import OrderStatus
 
 
 class UpdateOrderStatusUseCase(Protocol):
@@ -17,5 +18,7 @@ class UpdateOrderStatusUseCase(Protocol):
 
     # Use Case
 
-    def update_order_status(self, order_id: OrderId) -> UpdateOrderStatusResult:
+    def update_order_status(
+        self, order_id: OrderId, new_status: OrderStatus
+    ) -> UpdateOrderStatusResult:
         raise NotImplementedError
