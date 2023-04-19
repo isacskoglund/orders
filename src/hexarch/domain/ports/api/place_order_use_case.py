@@ -1,7 +1,7 @@
 from typing import Protocol
 from dataclasses import dataclass
 from models.identifiers import CustomerId, ProductId
-from models.order import Order
+from models.order import Order, Address
 
 
 class PlaceOrderUseCase(Protocol):
@@ -16,6 +16,7 @@ class PlaceOrderUseCase(Protocol):
 
         customer_id: CustomerId
         items: list[CommandItem]
+        address: Address
 
     # Results
 

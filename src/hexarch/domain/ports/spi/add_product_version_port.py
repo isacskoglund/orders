@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from models.product import ProductVersion
 
 
-class AddProductVersionIdPort(Protocol):
+class AddProductVersionPort(Protocol):
     # Result
 
     @dataclass(frozen=True)
