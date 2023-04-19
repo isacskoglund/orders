@@ -12,7 +12,7 @@ class GetOrdersByOrderIdsPort(Protocol):
         pass
 
     class OrdersNotFoundResult(GetOrdersByOrderIdsResult):
-        orders_not_found_ids: list[OrderId]
+        order_ids_not_found: list[OrderId]
 
     class SuccessfullyGotOrdersByIdResult(GetOrdersByOrderIdsResult):
         orders: list[Order]
