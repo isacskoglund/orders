@@ -29,9 +29,13 @@ class OrderItem:
 
 
 @dataclass(frozen=True)
-class Order:
-    id: OrderId
+class OrderPreSave:
     customer_id: CustomerId
     address: Address
     items: list[OrderItem]
     status: OrderStatus = OrderStatus.PENDING
+
+
+@dataclass(frozen=True)
+class Order(OrderPreSave):
+    id: OrderId
