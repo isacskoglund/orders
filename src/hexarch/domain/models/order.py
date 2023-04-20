@@ -44,12 +44,12 @@ class VersionedOrder(RequestedOrder):
     class Item(RequestedOrder.Item):
         product_version_id: ProductVersionId
 
-    def to_persisted_order(self, order_id: OrderId, status: PersistedOrder = None):
+    def to_persisted_order(self, id: OrderId, status: PersistedOrder = None):
         args = {
             "customer_id": self.customer_id,
             "shipping_address": self.shipping_address,
             "items": self.items,
-            "order_id": order_id,
+            "id": id,
         }
         if status is not None:
             args["status"] = status
@@ -65,7 +65,7 @@ class PersistedOrder(VersionedOrder):
         DELIVERED = "delivered"
         CANCELLED = "cancelled"
 
-    order_id: OrderId
+    id: OrderId
     status: Status = Status.PENDING
 
     def update_status(self, new_status: Status) -> PersistedOrder:
