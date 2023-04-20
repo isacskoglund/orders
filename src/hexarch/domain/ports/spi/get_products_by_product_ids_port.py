@@ -17,5 +17,7 @@ class GetProductsByProductIdsPort(Protocol):
         product_id: ProductId
 
     # Port
-    def get_products_by_product_ids(self, product_ids: list[ProductId]) -> Product:
+    def get_products_by_product_ids(
+        self, product_ids: list[ProductId]
+    ) -> list[Product]:
         raise NotImplementedError

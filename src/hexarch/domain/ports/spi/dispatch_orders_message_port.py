@@ -17,9 +17,6 @@ class DispatchOrderUpdateMessagePort(Protocol):
     class SuccessfullyDispatchedMessage(DispatchOrdersMessageResult):
         pass
 
-    class FailedToDispatchMessage(DispatchOrdersMessageResult):
-        pass
-
     # Port
     def dispatch_order_update_message(
         self, message: OrderUpdateMessage
