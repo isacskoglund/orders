@@ -3,7 +3,6 @@ from identifiers import OrderId, ProductId, ProductVersionId
 from identifiers import CustomerId
 from enum import Enum
 from dataclasses import dataclass, replace
-from product import ProductVersion
 
 
 @dataclass(frozen=True)
