@@ -10,10 +10,10 @@ class UpdateOrderStatusUseCase(Protocol):
     class UpdateOrderStatusResult:
         pass
 
-    class OrderNotFoundByIdResult(UpdateOrderStatusResult):
+    class OrderIdNotFoundResult(UpdateOrderStatusResult):
         pass
 
-    class InvalidOrderStatus(UpdateOrderStatusResult):
+    class SuccessfullyUpdatedOrderStatusResult(UpdateOrderStatusResult):
         pass
 
     # Use Case

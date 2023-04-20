@@ -27,6 +27,9 @@ class PlaceOrderUseCase(Protocol):
     class InvalidProductResult(PlaceOrderResult):
         product_id: ProductId
 
+    class FailedToSaveOrderResult(PlaceOrderResult):
+        pass
+
     class SuccessfullyPlacedOrderResult(PlaceOrderResult):
         new_user_was_created: bool
         order: Order
