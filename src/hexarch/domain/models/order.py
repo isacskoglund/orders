@@ -62,6 +62,7 @@ class VersionedOrder(RequestedOrder):
 class PersistedOrder(VersionedOrder):
     class Status(Enum):
         PENDING = "pending"
+        INVENTORY_ACCEPTED = "inventory_accepted"
         PAYMENT_COMPLETE = "payment_complete"
         SHIPPED = "shipped"
         DELIVERED = "delivered"
