@@ -46,7 +46,9 @@ class VersionedOrder(RequestedOrder):
     class Item(RequestedOrder.Item):
         product_version_id: ProductVersionId
 
-    def to_persisted_order(self, id: OrderId, status: PersistedOrder = None):
+    def to_persisted_order(
+        self, id: OrderId, status: PersistedOrder.Status | None = None
+    ):
         args = {
             "customer_id": self.customer_id,
             "shipping_address": self.shipping_address,
@@ -61,13 +63,13 @@ class VersionedOrder(RequestedOrder):
 
 class PersistedOrder(VersionedOrder):
     class Status(Enum):
-        PENDING = "pending"
-        INVENTORY_ACCEPTED = "inventory_accepted"
-        PAYMENT_COMPLETE = "payment_complete"
-        NO_LONGER_CANCELABLE = "no_longer_cancelable"
-        SHIPPED = "shipped"
-        DELIVERED = "delivered"
-        CANCELLED = "cancelled"
+        PENDING = 1
+        INVENTORY_ACCEPTED = 2
+        PAYMENT_COMPLETE = 3
+        NO_LONGER_CANCELABLE = 4
+        SHIPPED = 5
+        DELIVERED = 6
+        CANCELLED = 7
 
     id: OrderId
     status: Status = Status.PENDING

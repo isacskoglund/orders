@@ -33,7 +33,8 @@ class CancelOrderService(CancelOrderUseCase):
         if not force:
             current_status = order.status
             must_be_forced = (
-                current_status >= self.ORDER_CANCELLATION_MUST_BE_FORCED_STATUS
+                current_status.value
+                >= self.ORDER_CANCELLATION_MUST_BE_FORCED_STATUS.value
             )
         cancellation_should_be_performed = force or not must_be_forced
 
