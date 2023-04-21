@@ -21,6 +21,9 @@ class RequestedOrder:
     shipping_address: Address
     items: list[Item]
 
+    def get_product_ids(self) -> list[ProductId]:
+        return [item.product_id for item in self.items]
+
     def to_versioned_order(
         self, product_versions: dict[ProductId, ProductVersionId]
     ) -> VersionedOrder:
