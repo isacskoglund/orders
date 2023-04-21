@@ -1,5 +1,4 @@
 from typing import Protocol
-from dataclasses import dataclass
 from models.order import RequestedOrder, PersistedOrder
 
 

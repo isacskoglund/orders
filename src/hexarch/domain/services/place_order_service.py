@@ -9,7 +9,7 @@ from ports.spi.dispatch_order_status_update_event_port import (
 from models.order import RequestedOrder, PersistedOrder
 
 
-class OrdersService(PlaceOrderUseCase):
+class PlaceOrderService(PlaceOrderUseCase):
     def __init__(
         self,
         get_current_product_versions_port: GetCurrentProductVersionsPort,
