@@ -64,6 +64,7 @@ class PersistedOrder(VersionedOrder):
         PENDING = "pending"
         INVENTORY_ACCEPTED = "inventory_accepted"
         PAYMENT_COMPLETE = "payment_complete"
+        NO_LONGER_CANCELABLE = "no_longer_cancelable"
         SHIPPED = "shipped"
         DELIVERED = "delivered"
         CANCELLED = "cancelled"
