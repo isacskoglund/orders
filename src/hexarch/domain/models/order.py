@@ -63,16 +63,16 @@ class VersionedOrder(RequestedOrder):
 
 class PersistedOrder(VersionedOrder):
     class Status(Enum):
-        PENDING = 1
-        INVENTORY_ACCEPTED = 2
-        PAYMENT_COMPLETE = 3
+        WAITING_FOR_INVENTORY = 1
+        ACCEPTED_BY_INVENTORY = 2
+        PAID = 3
         NO_LONGER_CANCELABLE = 4
         SHIPPED = 5
         DELIVERED = 6
         CANCELLED = 7
 
     id: OrderId
-    status: Status = Status.PENDING
+    status: Status = Status.WAITING_FOR_INVENTORY
 
     def update_status(self, new_status: Status) -> PersistedOrder:
         return replace(self, status=new_status)

@@ -37,6 +37,16 @@ class NoCurrentProductVersionError(DomainError):
 
 
 # NoLongerCancelableError:
+
+
 @dataclass(frozen=True)
 class NoLongerCancelableError(DomainError):
+    order_id: OrderId
+
+
+# UnexpectedStatusUpdateError:
+
+
+@dataclass(frozen=True)
+class UnexpectedStatusUpdateError:
     order_id: OrderId
