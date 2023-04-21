@@ -1,6 +1,6 @@
 from ports.api.place_order_use_case import PlaceOrderUseCase
 
-from ports.spi.assign_product_versions_port import AssignProductVersionsPort
+from ports.spi.get_current_product_versions_port import GetCurrentProductVersionsPort
 from ports.spi.persist_order_port import PersistOrderPort
 from ports.spi.dispatch_order_status_update_event_port import (
     DispatchOrderStatusUpdateEventPort,
@@ -12,12 +12,12 @@ from models.order import RequestedOrder, PersistedOrder
 class OrdersService(PlaceOrderUseCase):
     def __init__(
         self,
-        assign_product_versions_port: AssignProductVersionsPort,
+        get_current_product_versions_port: GetCurrentProductVersionsPort,
         persist_order_port: PersistOrderPort,
         dispatch_order_status_update_event_port: DispatchOrderStatusUpdateEventPort,
     ) -> None:
-        self._assign_product_versions = (
-            assign_product_versions_port.assign_product_versions
+        self._get_current_product_versions = (
+            get_current_product_versions_port.get_current_product_versions
         )
         self._persist_order = persist_order_port.persist_order
         self._dispatch_order_status_update_event = (
@@ -25,7 +25,11 @@ class OrdersService(PlaceOrderUseCase):
         )
 
     def place_order(self, requested_order: RequestedOrder) -> PersistedOrder:
-        versioned_order = self._assign_product_versions(requested_order=requested_order)
+        product_ids = requested_order.get_product_ids()
+        product_versions = self._get_current_product_versions(product_ids=product_ids)
+        versioned_order = requested_order.to_versioned_order(
+            product_versions=product_versions
+        )
         persisted_order = self._persist_order(versioned_order=versioned_order)
         self._dispatch_order_status_update_event(persisted_order)
         return PersistedOrder
