@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from order import PersistedOrder
-from identifiers import OrderId
+from .order import PersistedOrder
+from .identifiers import OrderId
 
 
 @dataclass

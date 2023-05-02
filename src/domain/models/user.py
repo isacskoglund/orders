@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
-from identifiers import UserId, CustomerId
+from .identifiers import UserId, CustomerId
 
 
 @dataclass(frozen=True)
