@@ -1,6 +1,5 @@
 from __future__ import annotations
-from identifiers import OrderId, ProductId, ProductVersionId
-from identifiers import CustomerId
+from .identifiers import OrderId, ProductId, ProductVersionId, CustomerId
 from enum import Enum
 from dataclasses import dataclass, replace
 
@@ -76,3 +75,6 @@ class PersistedOrder(VersionedOrder):
 
     def update_status(self, new_status: Status) -> PersistedOrder:
         return replace(self, status=new_status)
+
+
+hej = 8
