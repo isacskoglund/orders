@@ -1,6 +1,6 @@
 from decimal import Decimal
 from dataclasses import dataclass
-from identifiers import ProductId, ProductVersionId
+from .identifiers import ProductId, ProductVersionId
 
 
 @dataclass(frozen=True)
