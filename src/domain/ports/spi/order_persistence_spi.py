@@ -3,10 +3,12 @@ from domain.models.order import VersionedOrder, PersistedOrder
 from domain.models.identifier import Identifier
 
 
-class GetOrderSPI(Protocol):
+class GetOrderByOrderIdSPI(Protocol):
     def get_order_by_order_id(self, order_id: Identifier) -> PersistedOrder:
         raise NotImplementedError
 
+
+class GetOrderByCustomerId(Protocol):
     def get_orders_by_customer_id(
         self, customer_id: Identifier
     ) -> list[PersistedOrder]:
