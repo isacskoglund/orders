@@ -8,7 +8,7 @@ class UpdateOrderStatusAPI(Protocol):
 
     def update_order_status(
         self, order_id: Identifier, new_status: S, force: bool = False
-    ) -> None:
+    ) -> PersistedOrder:
         """
         Raises:
            InvalidOrderIdError
