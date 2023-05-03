@@ -7,7 +7,7 @@ class UpdateOrderStatusAPI(Protocol):
     S = PersistedOrder.Status
 
     def update_order_status(
-        order_id: Identifier, new_status: S, force: bool = False
+        self, order_id: Identifier, new_status: S, force: bool = False
     ) -> None:
         """
         Raises:
