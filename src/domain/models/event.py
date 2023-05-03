@@ -8,7 +8,7 @@ class DispatchableEvent:
 
 
 @dataclass
-class OrderToBeValidated(DispatchableEvent):
+class OrderToBeValidatedEvent(DispatchableEvent):
     pass
 
 
@@ -32,10 +32,19 @@ class OrderCancelledEvent(DispatchableEvent):
     pass
 
 
+DISPATCHABLE_EVENTS = (
+    OrderToBeValidatedEvent
+    | OrderToBePaidEvent
+    | OrderToBeShippedEvent
+    | OrderShippedEvent
+    | OrderCancelledEvent
+)
+
+
 class StatusToEventMapper:
     S = PersistedOrder.Status
     status_to_event_map = {
-        S.REQUESTED: OrderToBeValidated,
+        S.REQUESTED: OrderToBeValidatedEvent,
         S.VALIDATED: OrderToBePaidEvent,
         S.PAID: OrderToBeShippedEvent,
         S.SHIPPED: OrderShippedEvent,
