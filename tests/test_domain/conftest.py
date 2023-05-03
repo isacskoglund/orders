@@ -1,6 +1,6 @@
 from typing import Callable
 from domain.models.identifier import Identifier
-from domain.models.order import RequestedOrder, VersionedOrder, Address
+from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
 from pytest import fixture
 from uuid import uuid4, UUID
 from random import choice, randint
@@ -15,10 +15,22 @@ class AddressTest(Address):
 
 
 @fixture
-def product_versions(size: int = 10) -> dict[IdentifierTest, IdentifierTest]:
+def address() -> AddressTest:
+    return AddressTest()
+
+
+@fixture
+def id_generator() -> Callable[[], IdentifierTest]:
+    return lambda: IdentifierTest()
+
+
+@fixture
+def product_versions(
+    id_generator: Callable[[], Identifier], size: int = 10
+) -> dict[IdentifierTest, IdentifierTest]:
     result = {}
-    for i in range(0, size):
-        result[IdentifierTest()] = IdentifierTest()
+    for _ in range(0, size):
+        result[id_generator()] = id_generator()
     return result
 
 
@@ -29,7 +41,7 @@ def requested_items(
     max_quantity: int = 10,
 ) -> list[RequestedOrder.Item]:
     result = []
-    for i in range(0, size):
+    for _ in range(0, size):
         product_id = choice(list(product_versions.keys()))
         item = RequestedOrder.Item(
             product_id=product_id, quantity=randint(1, max_quantity)
@@ -54,10 +66,17 @@ def versioned_items(
 
 
 @fixture
-def address() -> AddressTest:
-    return AddressTest()
-
-
-@fixture
-def id_generator() -> Callable[[], IdentifierTest]:
-    return lambda: IdentifierTest()
+def persisted_order(
+    id_generator: Callable[[], Identifier],
+    address: Address,
+    versioned_items: list[VersionedOrder.Item],
+) -> None:
+    order_id = id_generator()
+    customer_id = id_generator()
+    order = PersistedOrder(
+        id=order_id,
+        customer_id=customer_id,
+        items=versioned_items,
+        shipping_address=address,
+    )
+    return order
