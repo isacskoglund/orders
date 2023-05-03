@@ -4,9 +4,7 @@ from domain.models.identifier import Identifier
 
 
 class GetOrderSPI(Protocol):
-    def get_orders_by_order_ids(
-        self, order_ids: list[Identifier]
-    ) -> list[PersistedOrder]:
+    def get_order_by_order_id(self, order_id: Identifier) -> PersistedOrder:
         raise NotImplementedError
 
     def get_orders_by_customer_id(
