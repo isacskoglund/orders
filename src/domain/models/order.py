@@ -30,7 +30,7 @@ class RequestedOrder:
             VersionedOrder.Item(
                 product_id=item.product_id,
                 quantity=item.quantity,
-                product_version_id=product_versions[ProductId],
+                product_version_id=product_versions[item.product_id],
             )
             for item in self.items
         ]
@@ -41,7 +41,11 @@ class RequestedOrder:
         )
 
 
+@dataclass(frozen=True)
 class VersionedOrder(RequestedOrder):
+    items: list[Item]
+
+    @dataclass(frozen=True)
     class Item(RequestedOrder.Item):
         product_version_id: ProductVersionId
 
@@ -60,10 +64,11 @@ class VersionedOrder(RequestedOrder):
         return PersistedOrder(**args)
 
 
+@dataclass(frozen=True)
 class PersistedOrder(VersionedOrder):
     class Status(Enum):
-        WAITING_FOR_INVENTORY = 1
-        ACCEPTED_BY_INVENTORY = 2
+        REQUESTED = 1
+        VALIDATED = 2
         PAID = 3
         NO_LONGER_CANCELABLE = 4
         SHIPPED = 5
@@ -71,10 +76,7 @@ class PersistedOrder(VersionedOrder):
         CANCELLED = 7
 
     id: OrderId
-    status: Status = Status.WAITING_FOR_INVENTORY
+    status: Status = Status.REQUESTED
 
     def update_status(self, new_status: Status) -> PersistedOrder:
         return replace(self, status=new_status)
-
-
-hej = 8

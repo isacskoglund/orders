@@ -1,38 +1,55 @@
 from dataclasses import dataclass
 from .order import PersistedOrder
-from .identifiers import OrderId
 
 
 @dataclass
 class DispatchableEvent:
-    needs_order: bool  # CONVENTION: If false, then needs `order_id`
-
-
-@dataclass
-class OrderCreatedEvent(DispatchableEvent):
-    needs_order = True
     order: PersistedOrder
 
 
 @dataclass
-class OrderAcceptedByInventoryEvent(DispatchableEvent):
-    needs_order = True
-    order: PersistedOrder
+class OrderToBeValidated(DispatchableEvent):
+    pass
 
 
 @dataclass
-class OrderPaidEvent(DispatchableEvent):
-    needs_order = True
-    order: PersistedOrder
+class OrderToBePaidEvent(DispatchableEvent):
+    pass
+
+
+@dataclass
+class OrderToBeShippedEvent(DispatchableEvent):
+    pass
 
 
 @dataclass
 class OrderShippedEvent(DispatchableEvent):
-    needs_order = False
-    order_id: OrderId
+    pass
 
 
 @dataclass
 class OrderCancelledEvent(DispatchableEvent):
-    needs_order = False
-    order_id: OrderId
+    pass
+
+
+class StatusToDispatchableEventMapper:
+    S = PersistedOrder.Status
+    status_to_dispatchable_event_map = {
+        S.REQUESTED: OrderToBeValidated,
+        S.VALIDATED: OrderToBePaidEvent,
+        S.PAID: OrderToBeShippedEvent,
+        S.SHIPPED: OrderShippedEvent,
+        S.CANCELLED: OrderCancelledEvent,
+    }
+
+    def map_status_to_event(self, status: PersistedOrder.Status) -> type[DispatchableEvent] | None:
+        if status not in self.status_to_dispatchable_event_map:
+            return None
+        return self.status_to_dispatchable_event_map[status]
+
+    def create_event(self, order: PersistedOrder) -> DispatchableEvent | None:
+        status = order.status
+        event_cls = self.map_status_to_event(status=status)
+        if event_cls is None:
+            return None
+        return event_cls(order=order)
