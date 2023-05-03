@@ -32,9 +32,9 @@ class OrderCancelledEvent(DispatchableEvent):
     pass
 
 
-class StatusToDispatchableEventMapper:
+class StatusToEventMapper:
     S = PersistedOrder.Status
-    status_to_dispatchable_event_map = {
+    status_to_event_map = {
         S.REQUESTED: OrderToBeValidated,
         S.VALIDATED: OrderToBePaidEvent,
         S.PAID: OrderToBeShippedEvent,
@@ -42,10 +42,12 @@ class StatusToDispatchableEventMapper:
         S.CANCELLED: OrderCancelledEvent,
     }
 
-    def map_status_to_event(self, status: PersistedOrder.Status) -> type[DispatchableEvent] | None:
-        if status not in self.status_to_dispatchable_event_map:
+    def map_status_to_event(
+        self, status: PersistedOrder.Status
+    ) -> type[DispatchableEvent] | None:
+        if status not in self.status_to_event_map:
             return None
-        return self.status_to_dispatchable_event_map[status]
+        return self.status_to_event_map[status]
 
     def create_event(self, order: PersistedOrder) -> DispatchableEvent | None:
         status = order.status
