@@ -8,7 +8,7 @@ class GetOrderByOrderIdSPI(Protocol):
         raise NotImplementedError
 
 
-class GetOrderByCustomerId(Protocol):
+class GetOrdersByCustomerIdSPI(Protocol):
     def get_orders_by_customer_id(
         self, customer_id: Identifier
     ) -> list[PersistedOrder]:
