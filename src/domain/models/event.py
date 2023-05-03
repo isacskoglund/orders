@@ -32,7 +32,7 @@ class OrderCancelledEvent(DispatchableEvent):
     pass
 
 
-DISPATCHABLE_EVENTS = (
+DispatchableEvents = (
     OrderToBeValidatedEvent
     | OrderToBePaidEvent
     | OrderToBeShippedEvent
