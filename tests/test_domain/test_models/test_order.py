@@ -1,26 +1,14 @@
 from uuid import uuid4, UUID
 from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
 from domain.models.user import Customer
-from domain.models.identifiers import CustomerId, ProductId, ProductVersionId, OrderId
+from domain.models.identifier import Identifier
 from domain.models.product import Product, ProductVersion
 import random
 import pytest
 
 
-class CustomerIdTest(CustomerId):
-    id = uuid4()
-
-
-class ProductIdTest(ProductId):
-    id = uuid4()
-
-
-class ProductVersionIdTest(ProductVersionId):
-    id = uuid4()
-
-
-class OrderIdTest(OrderId):
-    id = uuid4()
+class IdentifierTest(Identifier):
+    id: UUID = uuid4()
 
 
 class AddressTest(Address):
@@ -28,16 +16,16 @@ class AddressTest(Address):
 
 
 @pytest.fixture
-def product_versions(size: int = 10) -> dict[ProductIdTest, ProductVersionIdTest]:
+def product_versions(size: int = 10) -> dict[IdentifierTest, IdentifierTest]:
     result = {}
     for i in range(0, size):
-        result[ProductIdTest()] = ProductVersionIdTest()
+        result[IdentifierTest()] = IdentifierTest()
     return result
 
 
 @pytest.fixture
 def requested_items(
-    product_versions: dict[ProductIdTest, ProductVersionIdTest],
+    product_versions: dict[IdentifierTest, IdentifierTest],
     size: int = 5,
     max_quantity: int = 10,
 ) -> list[RequestedOrder.Item]:
@@ -54,7 +42,7 @@ def requested_items(
 @pytest.fixture
 def versioned_items(
     requested_items: list[RequestedOrder.Item],
-    product_versions: dict[ProductIdTest, ProductVersionIdTest],
+    product_versions: dict[IdentifierTest, IdentifierTest],
 ) -> list[VersionedOrder.Item]:
     return [
         VersionedOrder.Item(
@@ -67,11 +55,11 @@ def versioned_items(
 
 
 def test_requested_order(
-    product_versions: dict[ProductIdTest, ProductVersionIdTest],
+    product_versions: dict[IdentifierTest, IdentifierTest],
     requested_items: list[RequestedOrder.Item],
     versioned_items: list[VersionedOrder.Item],
 ) -> None:
-    customer_id = CustomerIdTest()
+    customer_id = IdentifierTest()
     shipping_address = AddressTest()
     requested_order = RequestedOrder(
         customer_id=customer_id,
@@ -92,7 +80,7 @@ def test_requested_order(
 
 
 def test_versioned_order(versioned_items: list[VersionedOrder.Item]) -> None:
-    customer_id = CustomerIdTest()
+    customer_id = IdentifierTest()
     shipping_address = AddressTest()
 
     versioned_order = VersionedOrder(
@@ -101,7 +89,7 @@ def test_versioned_order(versioned_items: list[VersionedOrder.Item]) -> None:
         items=versioned_items,
     )
 
-    persisted_order_id = OrderIdTest()
+    persisted_order_id = IdentifierTest()
     custom_status = random.choice(list(PersistedOrder.Status))
 
     default_status_persisted_order = versioned_order.to_persisted_order(
@@ -122,8 +110,8 @@ def test_versioned_order(versioned_items: list[VersionedOrder.Item]) -> None:
 
 
 def test_persisted_order(versioned_items: list[VersionedOrder.Item]) -> None:
-    persisted_order_id = OrderIdTest()
-    customer_id = CustomerIdTest()
+    persisted_order_id = IdentifierTest()
+    customer_id = IdentifierTest()
     shipping_address = AddressTest()
     persisted_order = PersistedOrder(
         id=persisted_order_id,
@@ -142,3 +130,6 @@ def test_persisted_order(versioned_items: list[VersionedOrder.Item]) -> None:
         assert order.items == versioned_items
     assert persisted_order.status == PersistedOrder.Status.REQUESTED
     assert updated_persisted_order.status == custom_status
+
+
+# TODO: Assert that `>`, `>=` works as expected for PersistedOrder.Status

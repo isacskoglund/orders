@@ -1,13 +1,13 @@
 from enum import Enum
 from dataclasses import dataclass
-from .identifiers import UserId, CustomerId
+from .identifier import Identifier
 
 
 @dataclass(frozen=True)
 class User:
-    id: UserId
+    id: Identifier
 
 
 @dataclass(frozen=True)
 class Customer(User):
-    id: CustomerId
+    id: Identifier

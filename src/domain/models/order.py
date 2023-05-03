@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .identifiers import OrderId, ProductId, ProductVersionId, CustomerId
+from .identifier import Identifier
 from enum import Enum
 from dataclasses import dataclass, replace
 
@@ -13,18 +13,18 @@ class Address:
 class RequestedOrder:
     @dataclass(frozen=True)
     class Item:
-        product_id: ProductId
+        product_id: Identifier
         quantity: int
 
-    customer_id: CustomerId
+    customer_id: Identifier
     shipping_address: Address
     items: list[Item]
 
-    def get_product_ids(self) -> list[ProductId]:
+    def get_product_ids(self) -> list[Identifier]:
         return [item.product_id for item in self.items]
 
     def to_versioned_order(
-        self, product_versions: dict[ProductId, ProductVersionId]
+        self, product_versions: dict[Identifier, Identifier]
     ) -> VersionedOrder:
         items = [
             VersionedOrder.Item(
@@ -47,10 +47,10 @@ class VersionedOrder(RequestedOrder):
 
     @dataclass(frozen=True)
     class Item(RequestedOrder.Item):
-        product_version_id: ProductVersionId
+        product_version_id: Identifier
 
     def to_persisted_order(
-        self, id: OrderId, status: PersistedOrder.Status | None = None
+        self, id: Identifier, status: PersistedOrder.Status | None = None
     ):
         args = {
             "customer_id": self.customer_id,
@@ -75,7 +75,7 @@ class PersistedOrder(VersionedOrder):
         DELIVERED = 6
         CANCELLED = 7
 
-    id: OrderId
+    id: Identifier
     status: Status = Status.REQUESTED
 
     def update_status(self, new_status: Status) -> PersistedOrder:

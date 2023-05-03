@@ -1,6 +1,6 @@
 from decimal import Decimal
 from dataclasses import dataclass
-from .identifiers import ProductId, ProductVersionId
+from .identifier import Identifier
 
 
 @dataclass(frozen=True)
@@ -15,13 +15,13 @@ class ProductVersion:
     class Data:
         pass
 
-    id: ProductVersionId
-    product_id: ProductId
+    id: Identifier
+    product_id: Identifier
     price: Price
     data: Data
 
 
 @dataclass(frozen=True)
 class Product:
-    id: ProductId
-    current_version_id: ProductVersionId | None = None
+    id: Identifier
+    current_version_id: Identifier | None = None
