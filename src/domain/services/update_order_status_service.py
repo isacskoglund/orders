@@ -6,13 +6,12 @@ from domain.ports.spi.status_update_event_dispatcher_spi import (
 )
 
 from domain.models.order import PersistedOrder
+from domain.models.order_status import Status, StatusTransition
 from domain.models.event import StatusToEventMapper
 from domain.errors import InvalidOrderIdError, UnexpectedStatusUpdateError
 
 
 class UpdateOrderStatusService(UpdateOrderStatusAPI):
-    S = PersistedOrder.Status
-
     def __init__(
         self,
         update_order_spi: UpdateOrderSPI,
@@ -27,27 +26,23 @@ class UpdateOrderStatusService(UpdateOrderStatusAPI):
         self._create_event = event_mapper.create_event
 
     def update_order_status(
-        self, order_id: Identifier, new_status: S, force: bool = False
+        self, order_id: Identifier, new_status: Status, force: bool = False
     ) -> PersistedOrder:
         order = self._get_order(order_id=order_id)
         if order is None:
             raise InvalidOrderIdError(order_id=order_id)
-        if new_status == order.status:
-            return
-        update_is_expected = self._update_is_expected(
-            current_status=order.status, new_status=new_status
+        status_transition = StatusTransition(
+            from_status=order.status, to_status=new_status
         )
-        update_should_be_performed = update_is_expected or force
+        update_should_be_performed = not status_transition.is_abnormal or force
         if not update_should_be_performed:
             raise UnexpectedStatusUpdateError(order_id=order_id)
         updated_order = self._perform_update(order=order, new_status=new_status)
         return updated_order
 
-    @staticmethod
-    def _update_is_expected(current_status: S, new_status: S) -> bool:
-        return current_status.value == new_status.value - 1
-
-    def _perform_update(self, order: PersistedOrder, new_status: S) -> PersistedOrder:
+    def _perform_update(
+        self, order: PersistedOrder, new_status: Status
+    ) -> PersistedOrder:
         self._save_new_status(order_id=order.id, new_status=new_status)
         updated_order = order.update_status(new_status=new_status)
         event = self._create_event(order=updated_order)
