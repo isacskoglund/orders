@@ -1,6 +1,7 @@
 from typing import Protocol
 from domain.models.order import VersionedOrder, PersistedOrder
 from domain.models.identifier import Identifier
+from domain.models.order_status import Status
 
 
 class GetOrderByOrderIdSPI(Protocol):
@@ -21,7 +22,5 @@ class SaveOrderSPI(Protocol):
 
 
 class UpdateOrderSPI(Protocol):
-    def update_order_status(
-        self, order_id: Identifier, new_status: PersistedOrder.Status
-    ) -> None:
+    def update_order_status(self, order_id: Identifier, new_status: Status) -> None:
         raise NotImplementedError

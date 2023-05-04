@@ -1,6 +1,7 @@
 from typing import Callable
 from uuid import uuid4, UUID
 from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
+from domain.models.order_status import Status
 from domain.models.identifier import Identifier
 import random
 
@@ -45,7 +46,7 @@ def test_versioned_order(
         items=versioned_items,
     )
 
-    custom_status = random.choice(list(PersistedOrder.Status))
+    custom_status = random.choice(list(Status))
 
     default_status_persisted_order = versioned_order.to_persisted_order(
         id=persisted_order_id
@@ -60,7 +61,7 @@ def test_versioned_order(
         assert order.shipping_address == address
         assert order.items == versioned_items
         assert order.id == persisted_order_id
-    assert default_status_persisted_order.status == PersistedOrder.Status.REQUESTED
+    assert default_status_persisted_order.status == Status.PENDING
     assert custom_status_persisted_order.status == custom_status
 
 
@@ -78,7 +79,7 @@ def test_persisted_order(
         shipping_address=address,
     )
 
-    custom_status = random.choice(list(PersistedOrder.Status))
+    custom_status = random.choice(list(Status))
     updated_persisted_order = persisted_order.update_status(new_status=custom_status)
 
     for order in [persisted_order, updated_persisted_order]:
@@ -86,7 +87,7 @@ def test_persisted_order(
         assert order.customer_id == customer_id
         assert order.shipping_address == address
         assert order.items == versioned_items
-    assert persisted_order.status == PersistedOrder.Status.REQUESTED
+    assert persisted_order.status == Status.PENDING
     assert updated_persisted_order.status == custom_status
 
 
