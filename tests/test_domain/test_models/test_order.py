@@ -89,6 +89,3 @@ def test_persisted_order(
         assert order.items == versioned_items
     assert persisted_order.status == Status.PENDING
     assert updated_persisted_order.status == custom_status
-
-
-# TODO: Assert that `>`, `>=` works as expected for PersistedOrder.Status
