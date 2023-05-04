@@ -76,3 +76,9 @@ class TestStatusTransition:
                     )
                     == expectedness
                 )
+
+    def test_mapper_is_singleton(self) -> None:
+        mapper1 = TransitionToExpectednessMapper()
+        mapper2 = TransitionToExpectednessMapper()
+
+        assert mapper1 is mapper2
