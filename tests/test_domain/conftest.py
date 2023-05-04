@@ -25,6 +25,11 @@ def id_generator() -> Callable[[], IdentifierTest]:
 
 
 @fixture
+def identifier() -> IdentifierTest:
+    return IdentifierTest()
+
+
+@fixture
 def product_versions(
     id_generator: Callable[[], Identifier], size: int = 10
 ) -> dict[IdentifierTest, IdentifierTest]:
