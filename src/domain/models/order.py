@@ -1,5 +1,6 @@
 from __future__ import annotations
 from .identifier import Identifier
+from .order_status import Status
 from enum import Enum
 from dataclasses import dataclass, replace
 
@@ -66,17 +67,8 @@ class VersionedOrder(RequestedOrder):
 
 @dataclass(frozen=True)
 class PersistedOrder(VersionedOrder):
-    class Status(Enum):
-        REQUESTED = 1
-        VALIDATED = 2
-        PAID = 3
-        NO_LONGER_CANCELABLE = 4
-        SHIPPED = 5
-        DELIVERED = 6
-        CANCELLED = 7
-
     id: Identifier
-    status: Status = Status.REQUESTED
+    status: Status = Status.PENDING
 
     def update_status(self, new_status: Status) -> PersistedOrder:
         return replace(self, status=new_status)

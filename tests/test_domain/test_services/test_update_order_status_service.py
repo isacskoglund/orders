@@ -1,6 +1,7 @@
 from domain.models.event import StatusToEventMapper, DispatchableEvents
 from domain.models.identifier import Identifier
 from domain.models.order import PersistedOrder
+from domain.models.order_status import Status
 from domain.ports.spi.order_persistence_spi import UpdateOrderSPI, GetOrderByOrderIdSPI
 from domain.ports.spi.status_update_event_dispatcher_spi import (
     StatusUpdateEventDispatcherSPI,
@@ -11,17 +12,15 @@ import pytest
 
 
 class UpdateOrderDummy(UpdateOrderSPI):
-    statuses: dict[Identifier, PersistedOrder.Status] = {}
+    statuses: dict[Identifier, Status] = {}
 
-    def update_order_status(
-        self, order_id: Identifier, new_status: PersistedOrder.Status
-    ) -> None:
+    def update_order_status(self, order_id: Identifier, new_status: Status) -> None:
         self.statuses[order_id] = new_status
 
     def reset(self) -> None:
         self.statuses = {}
 
-    def read(self) -> tuple[Identifier, PersistedOrder.Status]:
+    def read(self) -> tuple[Identifier, Status]:
         return self.statuses
 
     def is_empty(self) -> bool:
@@ -79,7 +78,7 @@ class TestUpdateOrderStatusService:
         self._reset_dummies()
         with pytest.raises(InvalidOrderIdError):
             self.service.update_order_status(
-                order_id=identifier, new_status=PersistedOrder.Status.VALIDATED
+                order_id=identifier, new_status=Status.ACCEPTED_BY_INVENTORY
             )
 
         assert self.update_order_dummy.is_empty()
@@ -92,7 +91,7 @@ class TestUpdateOrderStatusService:
         self.get_order_dummy.add(order=persisted_order)
         with pytest.raises(UnexpectedStatusUpdateError):
             self.service.update_order_status(
-                order_id=persisted_order.id, new_status=PersistedOrder.Status.PAID
+                order_id=persisted_order.id, new_status=Status.PENDING
             )
 
         assert self.update_order_dummy.is_empty()
@@ -103,7 +102,7 @@ class TestUpdateOrderStatusService:
     ) -> None:
         self._reset_dummies()
         self.get_order_dummy.add(order=persisted_order)
-        new_status = PersistedOrder.Status.VALIDATED
+        new_status = Status.ACCEPTED_BY_INVENTORY
         result = self.service.update_order_status(
             order_id=persisted_order.id, new_status=new_status
         )

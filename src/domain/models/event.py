@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from .order import PersistedOrder
+from .order_status import Status
 
 
 @dataclass
@@ -8,7 +9,7 @@ class DispatchableEvent:
 
 
 @dataclass
-class OrderToBeValidatedEvent(DispatchableEvent):
+class OrderToBeAcceptedByInventoryEvent(DispatchableEvent):
     pass
 
 
@@ -33,7 +34,7 @@ class OrderCancelledEvent(DispatchableEvent):
 
 
 DispatchableEvents = (
-    OrderToBeValidatedEvent
+    OrderToBeAcceptedByInventoryEvent
     | OrderToBePaidEvent
     | OrderToBeShippedEvent
     | OrderShippedEvent
@@ -42,18 +43,15 @@ DispatchableEvents = (
 
 
 class StatusToEventMapper:
-    S = PersistedOrder.Status
     status_to_event_map = {
-        S.REQUESTED: OrderToBeValidatedEvent,
-        S.VALIDATED: OrderToBePaidEvent,
-        S.PAID: OrderToBeShippedEvent,
-        S.SHIPPED: OrderShippedEvent,
-        S.CANCELLED: OrderCancelledEvent,
+        Status.PENDING: OrderToBeAcceptedByInventoryEvent,
+        Status.ACCEPTED_BY_INVENTORY: OrderToBePaidEvent,
+        Status.PAID: OrderToBeShippedEvent,
+        Status.SHIPPED: OrderShippedEvent,
+        Status.CANCELLED: OrderCancelledEvent,
     }
 
-    def map_status_to_event(
-        self, status: PersistedOrder.Status
-    ) -> type[DispatchableEvent] | None:
+    def map_status_to_event(self, status: Status) -> type[DispatchableEvent] | None:
         if status not in self.status_to_event_map:
             return None
         return self.status_to_event_map[status]
