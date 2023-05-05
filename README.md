@@ -20,4 +20,4 @@ This repository is part of my larger hobby project [Shopper](https://github.com/
 
 ### Updates
 
-I try to update this README as make progress.
+I try to update this README as I make progress.
