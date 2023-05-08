@@ -33,7 +33,7 @@ class OrderCancelledEvent(DispatchableEvent):
     pass
 
 
-DispatchableEvents = (
+DispatchableEvents = (  # ???
     OrderToBeAcceptedByInventoryEvent
     | OrderToBePaidEvent
     | OrderToBeShippedEvent
