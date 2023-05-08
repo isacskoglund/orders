@@ -1,10 +1,35 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Optional, Callable
-from enum import Enum
+from typing import Any, Optional, Callable, Protocol
+from enum import Enum, auto
 
 
-class Singleton(type):
+class Status(Enum):
+    PENDING = auto()
+    ACCEPTED_BY_INVENTORY = auto()
+    PAID = auto()
+    SHIPPED = auto()
+    DELIVERED = auto()
+    CANCELLED = auto()
+
+
+class Expectedness(Enum):
+    ABNORMAL = auto()
+    UNEXPECTED = auto()
+    FORESEEN = auto()
+    NEXT_UP = auto()
+
+
+class StatusTransitionProtocol(Protocol):
+    from_status: Status
+    to_status: Status
+    is_abnormal: bool
+    is_unexpected: bool
+    is_foreseen: bool
+    is_next_up: bool
+
+
+class _SingletonMeta(type):
     """
     Metaclass for creating singleton classes.
     """
@@ -13,67 +38,11 @@ class Singleton(type):
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(_SingletonMeta, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
-class Status(Enum):
-    PENDING = "Order has been validated and is ready to be reviewed by inventory."
-    ACCEPTED_BY_INVENTORY = (
-        "Order has been accepted by inventory and is ready to be paid."
-    )
-    PAID = "Order has been paid and is ready to be shipped."
-    SHIPPED = "Order has been shipped."
-    DELIVERED = "Order has been delivered."
-    CANCELLED = "Order has been cancelled."
-
-
-@dataclass(frozen=True)
-class StatusTransition:
-    class Expectedness(Enum):
-        ABNORMAL = 0
-        UNEXPECTED = 1
-        FORESEEN = 2
-        NEXT_UP = 3
-
-    from_status: Status
-    to_status: Status
-    _custom_expectedness_mapper: Optional[
-        Callable[[Status, Status], StatusTransition.Expectedness]
-    ] = None
-
-    def _get_expectedness(
-        self, from_status: Status, to_status: Status
-    ) -> StatusTransition.Expectedness:
-        expectedness_mapper = self._custom_expectedness_mapper
-        if expectedness_mapper is None:
-            expectedness_mapper = TransitionToExpectednessMapper.get_expectedness
-        return expectedness_mapper(from_status=from_status, to_status=to_status)
-
-    @property
-    def expectedness(self) -> StatusTransition.Expectedness:
-        return self._get_expectedness(
-            from_status=self.from_status, to_status=self.to_status
-        )
-
-    @property
-    def is_abnormal(self) -> bool:
-        return self.expectedness.value <= StatusTransition.Expectedness.ABNORMAL.value
-
-    @property
-    def is_unexpected(self) -> bool:
-        return self.expectedness.value <= StatusTransition.Expectedness.UNEXPECTED.value
-
-    @property
-    def is_foreseen(self) -> bool:
-        return self.expectedness.value >= StatusTransition.Expectedness.FORESEEN.value
-
-    @property
-    def is_next_up(self) -> bool:
-        return self.expectedness.value >= StatusTransition.Expectedness.NEXT_UP.value
-
-
-class TransitionToExpectednessMapper(metaclass=Singleton):
+class TransitionToExpectednessMapper(metaclass=_SingletonMeta):
     """
     Singleton that maps an order status transition
     to a member of `Expectedness`.
@@ -107,10 +76,10 @@ class TransitionToExpectednessMapper(metaclass=Singleton):
 
     _key_to_expectedness_map = {
         # Assigns each key to a member of `Expectedness`.
-        0: StatusTransition.Expectedness.ABNORMAL,
-        1: StatusTransition.Expectedness.UNEXPECTED,
-        2: StatusTransition.Expectedness.FORESEEN,
-        3: StatusTransition.Expectedness.NEXT_UP,
+        0: Expectedness.ABNORMAL,
+        1: Expectedness.UNEXPECTED,
+        2: Expectedness.FORESEEN,
+        3: Expectedness.NEXT_UP,
     }
 
     @classmethod
@@ -118,11 +87,40 @@ class TransitionToExpectednessMapper(metaclass=Singleton):
         return cls._transition_to_expectedness_matrix[from_index][to_index]
 
     @classmethod
-    def get_expectedness(
-        cls, from_status: Status, to_status: Status
-    ) -> StatusTransition.Expectedness:
+    def get_expectedness(cls, from_status: Status, to_status: Status) -> Expectedness:
         from_index = cls._status_to_index_map[from_status]
         to_index = cls._status_to_index_map[to_status]
         expectedness_key = cls._indices_to_key(from_index=from_index, to_index=to_index)
         expectedness = cls._key_to_expectedness_map[expectedness_key]
         return expectedness
+
+
+@dataclass(frozen=True)
+class StatusTransition:
+    from_status: Status
+    to_status: Status
+    _get_expectedness: Optional[
+        Callable[[Status, Status], Expectedness]
+    ] = TransitionToExpectednessMapper.get_expectedness
+
+    @property
+    def _expectedness(self) -> Expectedness:
+        return self._get_expectedness(
+            from_status=self.from_status, to_status=self.to_status
+        )
+
+    @property
+    def is_abnormal(self) -> bool:
+        return self._expectedness in {Expectedness.ABNORMAL}
+
+    @property
+    def is_unexpected(self) -> bool:
+        return self._expectedness in {Expectedness.ABNORMAL, Expectedness.UNEXPECTED}
+
+    @property
+    def is_foreseen(self) -> bool:
+        return self._expectedness in {Expectedness.FORESEEN, Expectedness.NEXT_UP}
+
+    @property
+    def is_next_up(self) -> bool:
+        return self._expectedness in {Expectedness.NEXT_UP}
