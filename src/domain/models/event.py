@@ -33,15 +33,6 @@ class OrderCancelledEvent(DispatchableEvent):
     pass
 
 
-DispatchableEvents = (  # ???
-    OrderToBeAcceptedByInventoryEvent
-    | OrderToBePaidEvent
-    | OrderToBeShippedEvent
-    | OrderShippedEvent
-    | OrderCancelledEvent
-)
-
-
 class StatusToEventMapper:
     status_to_event_map = {
         Status.PENDING: OrderToBeAcceptedByInventoryEvent,

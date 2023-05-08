@@ -1,4 +1,4 @@
-from domain.models.event import StatusToEventMapper, DispatchableEvents
+from domain.models.event import StatusToEventMapper, DispatchableEvent
 from domain.models.identifier import Identifier
 from domain.models.order import PersistedOrder
 from domain.models.order_status import Status
@@ -41,15 +41,15 @@ class GetOrderByOrderIdDummy(GetOrderByOrderIdSPI):
 
 
 class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
-    dispatched_events: list[DispatchableEvents] = []
+    dispatched_events: list[DispatchableEvent] = []
 
-    def dispatch_event(self, event: DispatchableEvents) -> None:
+    def dispatch_event(self, event: DispatchableEvent) -> None:
         self.dispatched_events.append(event)
 
     def reset(self) -> None:
         self.dispatched_events = []
 
-    def read(self) -> list[DispatchableEvents]:
+    def read(self) -> list[DispatchableEvent]:
         return self.dispatched_events
 
     def is_empty(self) -> bool:

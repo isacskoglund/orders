@@ -1,7 +1,15 @@
 from typing import Protocol
-from domain.models.event import DispatchableEvents
+import domain.models.event as event
+
+Events = (
+    event.OrderToBeAcceptedByInventoryEvent
+    | event.OrderToBePaidEvent
+    | event.OrderToBeShippedEvent
+    | event.OrderShippedEvent
+    | event.OrderCancelledEvent
+)
 
 
 class StatusUpdateEventDispatcherSPI(Protocol):
-    def dispatch_event(self, event: DispatchableEvents) -> None:
+    def dispatch_event(self, event: Events) -> None:
         raise NotImplementedError
