@@ -1,9 +1,7 @@
 from typing import Callable
-from uuid import uuid4, UUID
 from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
 from domain.models.order_status import Status
 from domain.models.identifier import Identifier
-import random
 
 
 def test_requested_order(
@@ -46,7 +44,7 @@ def test_versioned_order(
         items=versioned_items,
     )
 
-    custom_status = random.choice(list(Status))
+    custom_status = Status.ACCEPTED_BY_INVENTORY
 
     default_status_persisted_order = versioned_order.to_persisted_order(
         id=persisted_order_id
@@ -79,7 +77,7 @@ def test_persisted_order(
         shipping_address=address,
     )
 
-    custom_status = random.choice(list(Status))
+    custom_status = Status.ACCEPTED_BY_INVENTORY
     updated_persisted_order = persisted_order.update_status(new_status=custom_status)
 
     for order in [persisted_order, updated_persisted_order]:

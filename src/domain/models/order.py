@@ -1,7 +1,6 @@
 from __future__ import annotations
 from .identifier import Identifier
 from .order_status import Status
-from enum import Enum
 from dataclasses import dataclass, replace
 
 
@@ -50,9 +49,7 @@ class VersionedOrder(RequestedOrder):
     class Item(RequestedOrder.Item):
         product_version_id: Identifier
 
-    def to_persisted_order(
-        self, id: Identifier, status: Status | None = None
-    ):
+    def to_persisted_order(self, id: Identifier, status: Status | None = None):
         args = {
             "customer_id": self.customer_id,
             "shipping_address": self.shipping_address,
