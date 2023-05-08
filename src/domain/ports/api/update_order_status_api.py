@@ -1,17 +1,27 @@
-from typing import Protocol
+from typing import Protocol, Union
 from domain.models.identifier import Identifier
 from domain.models.order import PersistedOrder
 from domain.models.order_status import Status
+from enum import Enum, auto
+
+
+class ExpectednessSetting(Enum):
+    REQUIRE_NEXT_UP = auto()
+    REQUIRE_FORSEEN = auto()
+    ALLOW_UNEXPECTED = auto()
+    ALLOW_ABNORMAL = auto()
 
 
 class UpdateOrderStatusAPI(Protocol):
-    
     def update_order_status(
-        self, order_id: Identifier, new_status: Status, force: bool = False
+        self,
+        order_id: Identifier,
+        new_status: Status,
+        setting: ExpectednessSetting = ExpectednessSetting.REQUIRE_NEXT_UP,
     ) -> PersistedOrder:
         """
         Raises:
            InvalidOrderIdError
-           UnexpectedStatusUpdateError
+           InsufficientExpectednessError
         """
         raise NotImplementedError
