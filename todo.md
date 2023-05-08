@@ -1,8 +1,0 @@
-- Review code structure. Missing protocols? Add docstrings? `auto()` 15 min
-- Place order service 30 min
-- Order data service 20 min
-- Persistence errors (cannot persist exception?) research 10 min, implement 10 min.
-- Remove randomness from tests. 15 min
-- Branch protection.
-- Github workflows, automated testing. 1 hour
-- Integrate with django.
