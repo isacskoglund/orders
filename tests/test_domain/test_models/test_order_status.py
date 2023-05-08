@@ -17,40 +17,55 @@ class ExpectednessMapperDummy:
 
 
 class TestStatusTransition:
-    def test_is_properties(self) -> None:
-        E = Expectedness
-        mapper_dummy = ExpectednessMapperDummy(current_expectedness=E.ABNORMAL)
-        transition = StatusTransition(
-            from_status=Status.PENDING,
-            to_status=Status.ACCEPTED_BY_INVENTORY,
-            _get_expectedness=mapper_dummy.get_expectedness,
-        )
-
-        mapper_dummy.current_expectedness = E.ABNORMAL
-        assert transition.is_abnormal is True
-        assert transition.is_unexpected is True
-        assert transition.is_foreseen is False
-        assert transition.is_next_up is False
-
-        mapper_dummy.current_expectedness = E.UNEXPECTED
-        assert transition.is_abnormal is False
-        assert transition.is_unexpected is True
-        assert transition.is_foreseen is False
-        assert transition.is_next_up is False
-
-        mapper_dummy.current_expectedness = E.FORESEEN
-        assert transition.is_abnormal is False
-        assert transition.is_unexpected is False
-        assert transition.is_foreseen is True
-        assert transition.is_next_up is False
-
-        mapper_dummy.current_expectedness = E.NEXT_UP
-        assert transition.is_abnormal is False
-        assert transition.is_unexpected is False
-        assert transition.is_foreseen is True
-        assert transition.is_next_up is True
+    mapper_dummy = ExpectednessMapperDummy(current_expectedness=Expectedness.ABNORMAL)
+    transition = StatusTransition(
+        from_status=Status.PENDING,
+        to_status=Status.ACCEPTED_BY_INVENTORY,
+        _get_expectedness=mapper_dummy.get_expectedness,
+    )
 
     def test_expectedness(self) -> None:
+        for expectedness in Expectedness:
+            self.mapper_dummy.current_expectedness = expectedness
+            assert self.transition._expectedness == expectedness
+
+    def test_is_properties(self) -> None:
+        self.mapper_dummy.current_expectedness = Expectedness.ABNORMAL
+        assert self.transition.is_abnormal is True
+        assert self.transition.is_unexpected is True
+        assert self.transition.is_foreseen is False
+        assert self.transition.is_next_up is False
+
+        self.mapper_dummy.current_expectedness = Expectedness.UNEXPECTED
+        assert self.transition.is_abnormal is False
+        assert self.transition.is_unexpected is True
+        assert self.transition.is_foreseen is False
+        assert self.transition.is_next_up is False
+
+        self.mapper_dummy.current_expectedness = Expectedness.FORESEEN
+        assert self.transition.is_abnormal is False
+        assert self.transition.is_unexpected is False
+        assert self.transition.is_foreseen is True
+        assert self.transition.is_next_up is False
+
+        self.mapper_dummy.current_expectedness = Expectedness.NEXT_UP
+        assert self.transition.is_abnormal is False
+        assert self.transition.is_unexpected is False
+        assert self.transition.is_foreseen is True
+        assert self.transition.is_next_up is True
+
+    def test_has_correct_default_mapper(self) -> None:
+        transition = StatusTransition(
+            from_status=Status.PENDING, to_status=Status.ACCEPTED_BY_INVENTORY
+        )
+        assert (
+            transition._get_expectedness
+            == TransitionToExpectednessMapper.get_expectedness
+        )
+
+
+class TestTransitionToExpectednessMapper:
+    def test_get_expectedness(self) -> None:
         for from_status in Status:
             for to_status in Status:
                 row = TransitionToExpectednessMapper._status_to_index_map[from_status]
