@@ -1,4 +1,3 @@
-from typing import Callable
 from domain.models.order import PersistedOrder
 from domain.models.order_status import Status
 from domain.models.event import StatusToEventMapper
