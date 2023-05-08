@@ -4,7 +4,6 @@ from domain.models.order_status import (
     StatusTransition,
     TransitionToExpectednessMapper,
 )
-from pytest import fixture
 from dataclasses import dataclass
 
 
