@@ -1,5 +1,6 @@
 from domain.models.order_status import (
     Status,
+    Expectedness,
     StatusTransition,
     TransitionToExpectednessMapper,
 )
@@ -9,22 +10,20 @@ from dataclasses import dataclass
 
 @dataclass
 class ExpectednessMapperDummy:
-    current_expectedness: StatusTransition.Expectedness
+    current_expectedness: Expectedness
 
-    def get_expectedness(
-        self, from_status: Status, to_status: Status
-    ) -> StatusTransition.Expectedness:
+    def get_expectedness(self, from_status: Status, to_status: Status) -> Expectedness:
         return self.current_expectedness
 
 
 class TestStatusTransition:
     def test_is_properties(self) -> None:
-        E = StatusTransition.Expectedness
+        E = Expectedness
         mapper_dummy = ExpectednessMapperDummy(current_expectedness=E.ABNORMAL)
         transition = StatusTransition(
             from_status=Status.PENDING,
             to_status=Status.ACCEPTED_BY_INVENTORY,
-            _custom_expectedness_mapper=mapper_dummy.get_expectedness,
+            _get_expectedness=mapper_dummy.get_expectedness,
         )
 
         mapper_dummy.current_expectedness = E.ABNORMAL
