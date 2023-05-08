@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from domain.models.identifier import Identifier
+from domain.models.order_status import StatusTransition
 
 
 class DomainError(Exception):
@@ -40,9 +41,7 @@ class NoCurrentProductVersionError(DomainError):
 
 
 @dataclass(frozen=True)
-class UnexpectedStatusUpdateError(DomainError):
+class InsufficientExpectednessError(DomainError):
     """
-    The attempted status update was not expected and must be forced.
+    The expectedness of the status update is insufficient.
     """
-
-    order_id: Identifier
