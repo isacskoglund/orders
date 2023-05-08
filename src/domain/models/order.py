@@ -51,7 +51,7 @@ class VersionedOrder(RequestedOrder):
         product_version_id: Identifier
 
     def to_persisted_order(
-        self, id: Identifier, status: PersistedOrder.Status | None = None
+        self, id: Identifier, status: Status | None = None
     ):
         args = {
             "customer_id": self.customer_id,
