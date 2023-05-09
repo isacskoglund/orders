@@ -15,18 +15,23 @@ class AddressTest(Address):
 
 
 @fixture
-def address() -> AddressTest:
-    return AddressTest()
-
-
-@fixture
 def id_generator() -> Callable[[], IdentifierTest]:
     return lambda: IdentifierTest()
 
 
 @fixture
+def address_generator() -> Callable[[], AddressTest]:
+    return lambda: AddressTest()
+
+
+@fixture
 def identifier() -> IdentifierTest:
     return IdentifierTest()
+
+
+@fixture
+def address() -> AddressTest:
+    return AddressTest()
 
 
 @fixture
@@ -75,7 +80,7 @@ def persisted_order(
     id_generator: Callable[[], Identifier],
     address: Address,
     versioned_items: list[VersionedOrder.Item],
-) -> None:
+) -> PersistedOrder:
     order_id = id_generator()
     customer_id = id_generator()
     order = PersistedOrder(
