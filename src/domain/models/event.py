@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 from .order import PersistedOrder
 from .order_status import Status
+from domain.utils.singleton_meta import SingletonMeta
 
 
 @dataclass
@@ -39,7 +40,7 @@ class StatusToEventMapperProtocol(Protocol):
         ...
 
 
-class StatusToEventMapper(StatusToEventMapperProtocol):
+class StatusToEventMapper(metaclass=SingletonMeta):
     status_to_event_map = {
         Status.PENDING: OrderToBeAcceptedByInventoryEvent,
         Status.ACCEPTED_BY_INVENTORY: OrderToBePaidEvent,
