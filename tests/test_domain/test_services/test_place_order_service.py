@@ -131,10 +131,15 @@ def test_place_order_service_invalid_product_id(
         save_order_spi=save_order_dummy,
         event_dispatcher=event_dispatcher_dummy,
     )
+    # Setup:
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
     get_product_version_ids_dummy.invalid_ids = [invalid_product_id]
+
+    # Run:
     with pytest.raises(InvalidProductIdError) as error_info:
         service.place_order(requested_order=invalid_order)
+
+    # Asserts:
     assert error_info.value.product_id == invalid_product_id
     assert save_order_dummy.is_empty()
     assert event_dispatcher_dummy.is_empty()
@@ -153,13 +158,17 @@ def test_place_order_service_valid_id_without_version(
         save_order_spi=save_order_dummy,
         event_dispatcher=event_dispatcher_dummy,
     )
+    # Setup
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
     get_product_version_ids_dummy.ids_without_product_version_id = [
         valid_product_id_with_missing_product_version
     ]
 
+    # Run:
     with pytest.raises(NoCurrentProductVersionError) as error_info:
         service.place_order(requested_order=valid_order_with_missing_product_version)
+
+    # Asserts:
     assert error_info.value.product_id == valid_product_id_with_missing_product_version
     assert save_order_dummy.is_empty()
     assert event_dispatcher_dummy.is_empty()
@@ -186,11 +195,10 @@ def test_place_order_service_success(
     status_to_event_mapper_dummy.event_type = EventTest
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
 
-    event_dispatcher_dummy.reset()
-
+    # Run:
     persisted_order_result = service.place_order(requested_order=valid_order)
 
+    # Asserts:
     assert persisted_order_result == persisted_order
     assert save_order_dummy.read() == [valid_versioned_order]
-
     assert event_dispatcher_dummy.read() == [EventTest(order=persisted_order)]
