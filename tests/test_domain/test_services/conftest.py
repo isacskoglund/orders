@@ -35,23 +35,19 @@ class UpdateOrderDummy(UpdateOrderSPI):
 
 @dataclass
 class SaveOrderDummy(SaveOrderSPI):
-    id_generator: Callable[[], Identifier]
+    persisted_order_to_return: PersistedOrder
 
-    orders: dict[Identifier, PersistedOrder] = field(default_factory=dict)
+    versioned_orders_saved: list[VersionedOrder] = field(default_factory=list)
 
     def save_order(self, versioned_order: VersionedOrder) -> PersistedOrder:
-        persisted_order = versioned_order.to_persisted_order(id=id)
-        self.orders[id] = persisted_order
-        return persisted_order
+        self.versioned_orders_saved.append(versioned_order)
+        return self.persisted_order_to_return
 
-    def reset(self) -> None:
-        self.orders = {}
-
-    def read(self) -> dict[Identifier, PersistedOrder]:
-        return self.orders
+    def read(self) -> list[VersionedOrder]:
+        return self.versioned_orders_saved
 
     def is_empty(self) -> bool:
-        return self.orders == {}
+        return self.versioned_orders_saved == []
 
 
 @dataclass
@@ -118,8 +114,8 @@ def update_order_dummy() -> UpdateOrderDummy:
 
 
 @fixture
-def save_order_dummy(id_generator) -> SaveOrderDummy:
-    return SaveOrderDummy(id_generator=id_generator)
+def save_order_dummy(persisted_order: PersistedOrder) -> SaveOrderDummy:
+    return SaveOrderDummy(persisted_order_to_return=persisted_order)
 
 
 @fixture
