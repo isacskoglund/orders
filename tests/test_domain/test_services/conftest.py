@@ -17,8 +17,9 @@ from pytest import fixture
 from dataclasses import dataclass, field
 
 
+@dataclass
 class UpdateOrderDummy(UpdateOrderSPI):
-    statuses: dict[Identifier, Status] = {}
+    statuses: dict[Identifier, Status] = field(default_factory=dict)
 
     def update_order_status(self, order_id: Identifier, new_status: Status) -> None:
         self.statuses[order_id] = new_status
@@ -63,8 +64,9 @@ class GetProductVersionIdsDummy(GetProductVersionIdsSPI):
         )
 
 
+@dataclass
 class GetOrderByOrderIdDummy(GetOrderByOrderIdSPI):
-    orders: dict[Identifier, PersistedOrder] = {}
+    orders: dict[Identifier, PersistedOrder] = field(default_factory=dict)
 
     def get_order_by_order_id(self, order_id: Identifier) -> PersistedOrder | None:
         return self.orders.get(order_id)
@@ -76,8 +78,9 @@ class GetOrderByOrderIdDummy(GetOrderByOrderIdSPI):
         self.orders[order.id] = order
 
 
+@dataclass
 class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
-    dispatched_events: list[DispatchableEvent] = []
+    dispatched_events: list[DispatchableEvent] = field(default_factory=list)
 
     def dispatch_event(self, event: DispatchableEvent) -> None:
         self.dispatched_events.append(event)
@@ -86,6 +89,7 @@ class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
         return self.dispatched_events
 
     def is_empty(self) -> bool:
+        print(self.dispatched_events)
         return self.dispatched_events == []
 
 
@@ -104,7 +108,7 @@ class EventTest(DispatchableEvent):
 
 @fixture
 def update_order_dummy() -> UpdateOrderDummy:
-    return UpdateOrderDummy
+    return UpdateOrderDummy()
 
 
 @fixture
