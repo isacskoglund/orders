@@ -89,7 +89,6 @@ class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
         return self.dispatched_events
 
     def is_empty(self) -> bool:
-        print(self.dispatched_events)
         return self.dispatched_events == []
 
 
