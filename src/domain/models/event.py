@@ -54,11 +54,3 @@ class StatusToEventMapper(metaclass=SingletonMeta):
         if status not in cls.status_to_event_map:
             return None
         return cls.status_to_event_map[status]
-
-    @classmethod
-    def create_event(cls, order: PersistedOrder) -> DispatchableEvent | None:
-        status = order.status
-        event_cls = cls.map_status_to_event(status=status)
-        if event_cls is None:
-            return None
-        return event_cls(order=order)

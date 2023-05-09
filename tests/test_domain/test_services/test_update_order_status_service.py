@@ -160,9 +160,7 @@ class TestUpdateOrderStatusService:
         status_update_event_dispatcher_spi=event_dispatcher_dummy,
         _validate_transition=transition_validator_dummy.validate_transition,
     )
-
-    _status_to_event_mapper = StatusToEventMapper()
-    create_expected_event = _status_to_event_mapper.create_event
+    status_to_event_mapper = StatusToEventMapper
 
     def _reset_dummies(self):
         self.update_order_dummy.reset()
@@ -203,7 +201,10 @@ class TestUpdateOrderStatusService:
             order_id=persisted_order.id, new_status=new_status
         )
         expected_result = persisted_order.update_status(new_status=new_status)
-        expected_event = self.create_expected_event(order=expected_result)
+        expected_event_type = self.status_to_event_mapper.map_status_to_event(
+            status=new_status
+        )
+        expected_event = expected_event_type(order=expected_result)
 
         assert result == expected_result
         assert self.update_order_dummy.read() == {persisted_order.id: new_status}
