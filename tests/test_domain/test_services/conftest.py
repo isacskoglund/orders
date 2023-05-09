@@ -23,9 +23,6 @@ class UpdateOrderDummy(UpdateOrderSPI):
     def update_order_status(self, order_id: Identifier, new_status: Status) -> None:
         self.statuses[order_id] = new_status
 
-    def reset(self) -> None:
-        self.statuses = {}
-
     def read(self) -> dict[Identifier, Status]:
         return self.statuses
 
@@ -84,9 +81,6 @@ class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
 
     def dispatch_event(self, event: DispatchableEvent) -> None:
         self.dispatched_events.append(event)
-
-    def reset(self) -> None:
-        self.dispatched_events = []
 
     def read(self) -> list[DispatchableEvent]:
         return self.dispatched_events
