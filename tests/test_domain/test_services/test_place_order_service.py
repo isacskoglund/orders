@@ -185,7 +185,7 @@ def test_place_order_service_success(
     save_order_dummy.reset()
     event_dispatcher_dummy.reset()
 
-    service.place_order(requested_order=valid_order)
+    persisted_order = service.place_order(requested_order=valid_order)
 
     saved_orders = save_order_dummy.read()
     assert len(saved_orders) == 1
@@ -195,6 +195,4 @@ def test_place_order_service_success(
     )
     assert expected_persisted_order == saved_orders[expected_order_id]
 
-    dispatched_events = event_dispatcher_dummy.read()
-    assert len(dispatched_events) == 1
-    assert dispatched_events[0].order == expected_persisted_order
+    assert event_dispatcher_dummy.read() == [EventTest(order=persisted_order)]
