@@ -1,4 +1,5 @@
 from __future__ import annotations
+from domain.utils.singleton_meta import SingletonMeta
 from dataclasses import dataclass
 from typing import Any, Optional, Callable, Protocol
 from enum import Enum, auto
@@ -29,20 +30,7 @@ class StatusTransitionProtocol(Protocol):
     is_next_up: bool
 
 
-class _SingletonMeta(type):
-    """
-    Metaclass for creating singleton classes.
-    """
-
-    _instances = {}
-
-    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
-        if cls not in cls._instances:
-            cls._instances[cls] = super(_SingletonMeta, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class TransitionToExpectednessMapper(metaclass=_SingletonMeta):
+class TransitionToExpectednessMapper(metaclass=SingletonMeta):
     """
     Singleton that maps an order status transition
     to a member of `Expectedness`.
