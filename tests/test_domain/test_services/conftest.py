@@ -15,7 +15,6 @@ from domain.models.event import DispatchableEvent, StatusToEventMapperProtocol
 from typing import Callable
 from pytest import fixture
 from dataclasses import dataclass, field
-from uuid import uuid4, UUID
 
 
 class UpdateOrderDummy(UpdateOrderSPI):
@@ -134,7 +133,7 @@ class StatusToEventMapperDummy(StatusToEventMapperProtocol):
 
 @dataclass
 class EventTest(DispatchableEvent):
-    uuid: UUID = uuid4()
+    ...
 
 
 @fixture
