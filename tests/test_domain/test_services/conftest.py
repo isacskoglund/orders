@@ -54,44 +54,20 @@ class SaveOrderDummy(SaveOrderSPI):
         return self.orders == {}
 
 
+@dataclass
 class GetProductVersionIdsDummy(GetProductVersionIdsSPI):
-    product_version_ids: dict[Identifier, Identifier | None] = {}
+    product_version_ids: dict[Identifier, Identifier] = field(default_factory=dict)
+    invalid_ids: set[Identifier] = field(default_factory=set)
+    ids_without_product_version_id: set[Identifier] = field(default_factory=set)
 
     def get_product_versions(
         self, product_ids: list[Identifier]
     ) -> GetProductVersionIdsSPI.Result:
-        result = GetProductVersionIdsSPI.Result(
-            product_version_ids={},
-            invalid_ids=set(),
-            ids_without_product_version_id=set(),
+        return GetProductVersionIdsSPI.Result(
+            product_version_ids=self.product_version_ids,
+            invalid_ids=self.invalid_ids,
+            ids_without_product_version_id=self.ids_without_product_version_id,
         )
-        for id in product_ids:
-            if id not in self.product_version_ids:
-                result.invalid_ids.add(id)
-                continue
-            if self.product_version_ids[id] is None:
-                result.ids_without_product_version_id.add(id)
-                continue
-            product_version_id = self.product_version_ids[id]
-            result.product_version_ids[id] = product_version_id
-        return result
-
-    def reset(self) -> None:
-        self.product_version_ids = {}
-
-    def set(self, product_version_ids: dict[Identifier, Identifier | None]) -> None:
-        self.product_version_ids = product_version_ids
-
-    def read(self) -> dict[Identifier, Identifier | None]:
-        return self.product_version_ids
-
-    def is_empty(self) -> bool:
-        return self.product_version_ids == {}
-
-    def add(
-        self, product_id: Identifier, product_version_id: Identifier | None
-    ) -> None:
-        self.product_version_ids[product_id] = product_version_id
 
 
 class GetOrderByOrderIdDummy(GetOrderByOrderIdSPI):
