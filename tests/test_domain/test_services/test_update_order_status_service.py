@@ -13,6 +13,7 @@ from conftest import (
     GetOrderByOrderIdDummy,
     EventDispatcherDummy,
     StatusToEventMapperDummy,
+    EventTest,
 )
 from dataclasses import dataclass
 from typing import Callable
@@ -174,6 +175,7 @@ def test_update_order_status_success(
     get_order_by_id_dummy: GetOrderByOrderIdDummy,
     event_dispatcher_dummy: EventDispatcherDummy,
     transition_validator_dummy: TransitionValidatorDummy,
+    status_to_event_mapper_dummy: StatusToEventMapperDummy,
 ) -> None:
     # Setup:
     service = UpdateOrderStatusService(
@@ -181,13 +183,13 @@ def test_update_order_status_success(
         get_order_by_order_id_spi=get_order_by_id_dummy,
         status_update_event_dispatcher_spi=event_dispatcher_dummy,
         _validate_transition=transition_validator_dummy.validate_transition,
+        _status_to_event_mapper=status_to_event_mapper_dummy,
     )
     get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
     transition_validator_dummy.set_valid()
     new_status = Status.ACCEPTED_BY_INVENTORY
     expected_result = persisted_order.update_status(new_status=new_status)
-    expected_event_type = StatusToEventMapper.map_status_to_event(status=new_status)
-    expected_event = expected_event_type(order=expected_result)
+    status_to_event_mapper_dummy.event_type = EventTest
 
     # Run:
     result = service.update_order_status(
@@ -197,4 +199,4 @@ def test_update_order_status_success(
     # Asserts:
     assert result == expected_result
     assert update_order_dummy.read() == {persisted_order.id: new_status}
-    assert event_dispatcher_dummy.read() == [expected_event]
+    assert event_dispatcher_dummy.read() == [EventTest(order=expected_result)]
