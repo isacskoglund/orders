@@ -11,10 +11,11 @@ from domain.ports.spi.status_update_event_dispatcher_spi import (
 from domain.models.identifier import Identifier
 from domain.models.order_status import Status
 from domain.models.order import PersistedOrder, VersionedOrder
-from domain.models.event import DispatchableEvent
+from domain.models.event import DispatchableEvent, StatusToEventMapperProtocol
 from typing import Callable
 from pytest import fixture
 from dataclasses import dataclass, field
+from uuid import uuid4, UUID
 
 
 class UpdateOrderDummy(UpdateOrderSPI):
@@ -123,6 +124,19 @@ class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
         return self.dispatched_events == []
 
 
+@dataclass
+class StatusToEventMapperDummy(StatusToEventMapperProtocol):
+    event_type: type[DispatchableEvent] | None = None
+
+    def map_status_to_event(self, status: Status) -> type[DispatchableEvent] | None:
+        return self.event_type
+
+
+@dataclass
+class EventTest(DispatchableEvent):
+    uuid: UUID = uuid4()
+
+
 @fixture
 def update_order_dummy() -> UpdateOrderDummy:
     return UpdateOrderDummy
@@ -146,3 +160,8 @@ def get_order_by_id_dummy() -> GetOrderByOrderIdDummy:
 @fixture
 def event_dispatcher_dummy() -> EventDispatcherDummy:
     return EventDispatcherDummy()
+
+
+@fixture
+def status_to_event_mapper_dummy() -> StatusToEventMapperDummy:
+    return StatusToEventMapperDummy()

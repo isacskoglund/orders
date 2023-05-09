@@ -6,6 +6,8 @@ from conftest import (
     SaveOrderDummy,
     GetProductVersionIdsDummy,
     EventDispatcherDummy,
+    StatusToEventMapperDummy,
+    EventTest,
 )
 from typing import Callable
 from random import randint
@@ -13,6 +15,7 @@ from pytest import fixture
 import pytest
 
 MAX_ORDER_ITEM_QUANTITY = 10
+
 
 # Product Ids:
 
@@ -169,12 +172,15 @@ def test_place_order_service_success(
     product_ids_to_version_ids: dict[Identifier, Identifier],
     valid_order: RequestedOrder,
     valid_versioned_order: VersionedOrder,
+    status_to_event_mapper_dummy: StatusToEventMapperDummy,
 ) -> None:
     service = PlaceOrderService(
         get_product_version_ids_spi=get_product_version_ids_dummy,
         save_order_spi=save_order_dummy,
         event_dispatcher=event_dispatcher_dummy,
+        _event_mapper=status_to_event_mapper_dummy,
     )
+    status_to_event_mapper_dummy.event_type = EventTest
     get_product_version_ids_dummy.set(product_version_ids=product_ids_to_version_ids)
     save_order_dummy.reset()
     event_dispatcher_dummy.reset()
