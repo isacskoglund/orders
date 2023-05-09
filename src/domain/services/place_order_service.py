@@ -16,7 +16,7 @@ class PlaceOrderService(PlaceOrderAPI):
     get_product_version_ids_spi: GetProductVersionIdsSPI
     save_order_spi: SaveOrderSPI
     event_dispatcher: StatusUpdateEventDispatcherSPI
-    _event_mapper: Optional[StatusToEventMapperProtocol] = StatusToEventMapper()
+    _event_mapper: Optional[StatusToEventMapperProtocol] = StatusToEventMapper
 
     def place_order(self, requested_order: RequestedOrder) -> PersistedOrder:
         versioned_order = self._version_order(requested_order=requested_order)

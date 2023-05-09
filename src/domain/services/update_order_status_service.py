@@ -54,7 +54,7 @@ class UpdateOrderStatusService(UpdateOrderStatusAPI):
         self._dispatch_event = status_update_event_dispatcher_spi.dispatch_event
         self._validate_transition = _validate_transition
 
-        event_mapper = StatusToEventMapper()
+        event_mapper = StatusToEventMapper
         self._create_event = event_mapper.create_event
 
     def update_order_status(
