@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Protocol
 from .order import PersistedOrder
 from .order_status import Status
 
@@ -33,7 +34,12 @@ class OrderCancelledEvent(DispatchableEvent):
     pass
 
 
-class StatusToEventMapper:
+class StatusToEventMapperProtocol(Protocol):
+    def map_status_to_event(self, status: Status) -> type[DispatchableEvent] | None:
+        ...
+
+
+class StatusToEventMapper(StatusToEventMapperProtocol):
     status_to_event_map = {
         Status.PENDING: OrderToBeAcceptedByInventoryEvent,
         Status.ACCEPTED_BY_INVENTORY: OrderToBePaidEvent,
