@@ -170,10 +170,10 @@ def test_place_order_service_success(
     save_order_dummy: SaveOrderDummy,
     event_dispatcher_dummy: EventDispatcherDummy,
     product_ids_to_version_ids: dict[Identifier, Identifier],
-    valid_product_id_with_missing_product_version: set[Identifier],
     valid_order: RequestedOrder,
     valid_versioned_order: VersionedOrder,
     status_to_event_mapper_dummy: StatusToEventMapperDummy,
+    persisted_order: PersistedOrder,
 ) -> None:
     service = PlaceOrderService(
         get_product_version_ids_spi=get_product_version_ids_dummy,
@@ -181,21 +181,16 @@ def test_place_order_service_success(
         event_dispatcher=event_dispatcher_dummy,
         _event_mapper=status_to_event_mapper_dummy,
     )
+
+    # Setup:
     status_to_event_mapper_dummy.event_type = EventTest
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
-    save_order_dummy.reset()
+
     event_dispatcher_dummy.reset()
 
-    persisted_order = service.place_order(requested_order=valid_order)
+    persisted_order_result = service.place_order(requested_order=valid_order)
 
-    saved_orders = save_order_dummy.read()
-    assert len(saved_orders) == 1
-    expected_order_id = next(iter(saved_orders))
-    expected_persisted_order = valid_versioned_order.to_persisted_order(
-        id=expected_order_id
-    )
-    assert expected_persisted_order == saved_orders[expected_order_id]
-
-    assert save_order_dummy.read() == {expected_order_id: expected_persisted_order}
+    assert persisted_order_result == persisted_order
+    assert save_order_dummy.read() == [valid_versioned_order]
 
     assert event_dispatcher_dummy.read() == [EventTest(order=persisted_order)]
