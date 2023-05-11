@@ -19,28 +19,39 @@ from domain.models.event import (
     DispatchableEvent,
 )
 from domain.errors import InvalidOrderIdError, InsufficientExpectednessError
-from typing import Callable
+from domain.utils.singleton_meta import SingletonMeta
+from typing import Protocol
 
 
-def _validate_transition(
-    transition: StatusTransitionProtocol, setting: ExpectednessSetting
-) -> bool:
-    E = ExpectednessSetting
+class TransitionValidatorProtocol(Protocol):
+    @classmethod
+    def validate_transition(
+        cls, transition: StatusTransitionProtocol, setting: ExpectednessSetting
+    ) -> bool:
+        ...
 
-    # If setting is a requirement, check if it is met.
-    if setting is E.REQUIRE_NEXT_UP:
-        return transition.is_next_up
-    if setting is E.REQUIRE_FORSEEN:
-        return transition.is_foreseen
 
-    # If transition has a dangerous property, check if has been allowed.
-    if transition.is_abnormal:
-        return setting is E.ALLOW_ABNORMAL
-    if transition.is_unexpected:
-        return setting in {E.ALLOW_ABNORMAL, E.ALLOW_UNEXPECTED}
+class TransitionValidator(metaclass=SingletonMeta):
+    @classmethod
+    def validate_transition(
+        cls, transition: StatusTransitionProtocol, setting: ExpectednessSetting
+    ) -> bool:
+        E = ExpectednessSetting
 
-    # If transition has no dangerous properties, and setting is no requirement.
-    return True
+        # If setting is a requirement, check if it is met.
+        if setting is E.REQUIRE_NEXT_UP:
+            return transition.is_next_up
+        if setting is E.REQUIRE_FORSEEN:
+            return transition.is_foreseen
+
+        # If transition has a dangerous property, check if has been allowed.
+        if transition.is_abnormal:
+            return setting is E.ALLOW_ABNORMAL
+        if transition.is_unexpected:
+            return setting in {E.ALLOW_ABNORMAL, E.ALLOW_UNEXPECTED}
+
+        # If transition has no dangerous properties, and setting is no requirement.
+        return True
 
 
 class UpdateOrderStatusService(UpdateOrderStatusAPI):
@@ -49,15 +60,13 @@ class UpdateOrderStatusService(UpdateOrderStatusAPI):
         update_order_spi: UpdateOrderSPI,
         get_order_by_order_id_spi: GetOrderByOrderIdSPI,
         status_update_event_dispatcher_spi: StatusUpdateEventDispatcherSPI,
-        _validate_transition: Callable[
-            [StatusTransitionProtocol, ExpectednessSetting], bool
-        ] = _validate_transition,
+        _transition_validator: TransitionValidatorProtocol = TransitionValidator,
         _status_to_event_mapper: StatusToEventMapperProtocol = StatusToEventMapper,
     ) -> None:
         self._save_new_status = update_order_spi.update_order_status
         self._get_order = get_order_by_order_id_spi.get_order_by_order_id
         self._dispatch_event = status_update_event_dispatcher_spi.dispatch_event
-        self._validate_transition = _validate_transition
+        self._validate_transition = _transition_validator.validate_transition
         self._event_mapper = _status_to_event_mapper
 
     def update_order_status(
