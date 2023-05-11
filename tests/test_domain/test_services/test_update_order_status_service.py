@@ -5,7 +5,7 @@ from domain.models.event import DispatchableEvent
 from domain.ports.api.update_order_status_api import ExpectednessSetting
 from domain.services.update_order_status_service import (
     UpdateOrderStatusService,
-    _validate_transition,
+    TransitionValidator,
 )
 from domain.errors import InvalidOrderIdError, InsufficientExpectednessError
 from conftest import (
@@ -53,20 +53,22 @@ class TransitionDummy(StatusTransitionProtocol):
         self.is_next_up = True
 
 
-@dataclass
 class TransitionValidatorDummy:
     is_valid: bool = False
 
+    @classmethod
     def validate_transition(
-        self, transition: StatusTransitionProtocol, setting: ExpectednessSetting
+        cls, transition: StatusTransitionProtocol, setting: ExpectednessSetting
     ) -> bool:
-        return self.is_valid
+        return cls.is_valid
 
-    def set_valid(self) -> None:
-        self.is_valid = True
+    @classmethod
+    def set_valid(cls) -> None:
+        cls.is_valid = True
 
-    def set_invalid(self) -> None:
-        self.is_valid = False
+    @classmethod
+    def set_invalid(cls) -> None:
+        cls.is_valid = False
 
 
 @pytest.fixture
@@ -79,11 +81,13 @@ def transition_validator_dummy() -> TransitionValidatorDummy:
     return TransitionValidatorDummy()
 
 
-def test_validate_transition(transition_dummy: TransitionDummy) -> None:
+def test_transition_validator(transition_dummy: TransitionDummy) -> None:
     E = ExpectednessSetting
-    is_valid = lambda setting: _validate_transition(
-        transition=transition_dummy, setting=setting
-    )
+
+    def is_valid(setting: E):
+        return TransitionValidator.validate_transition(
+            transition=transition_dummy, setting=setting
+        )
 
     # validate with all 4 available settings for each state of the dummy.
 
@@ -112,6 +116,12 @@ def test_validate_transition(transition_dummy: TransitionDummy) -> None:
     assert is_valid(E.REQUIRE_NEXT_UP) is True
 
 
+def test_transition_validator_is_singleton() -> None:
+    validator1 = TransitionValidator()
+    validator2 = TransitionValidator()
+    assert validator1 is validator2
+
+
 def test_update_order_status_invalid_order_id(
     id_generator: Callable[[], Identifier],
     update_order_dummy: UpdateOrderDummy,
@@ -124,7 +134,7 @@ def test_update_order_status_invalid_order_id(
         update_order_spi=update_order_dummy,
         get_order_by_order_id_spi=get_order_by_id_dummy,
         status_update_event_dispatcher_spi=event_dispatcher_dummy,
-        _validate_transition=transition_validator_dummy.validate_transition,
+        _transition_validator=transition_validator_dummy,
     )
     order_id = id_generator()
 
@@ -152,7 +162,7 @@ def test_update_order_status_invalid_transition(
         update_order_spi=update_order_dummy,
         get_order_by_order_id_spi=get_order_by_id_dummy,
         status_update_event_dispatcher_spi=event_dispatcher_dummy,
-        _validate_transition=transition_validator_dummy.validate_transition,
+        _transition_validator=transition_validator_dummy,
     )
     get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
     transition_validator_dummy.set_invalid()
@@ -181,8 +191,8 @@ def test_update_order_status_success(
         update_order_spi=update_order_dummy,
         get_order_by_order_id_spi=get_order_by_id_dummy,
         status_update_event_dispatcher_spi=event_dispatcher_dummy,
-        _validate_transition=transition_validator_dummy.validate_transition,
         _status_to_event_mapper=status_to_event_mapper_dummy,
+        _transition_validator=transition_validator_dummy,
     )
     get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
     transition_validator_dummy.set_valid()
