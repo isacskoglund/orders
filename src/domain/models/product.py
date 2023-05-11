@@ -1,4 +1,3 @@
-from decimal import Decimal
 from dataclasses import dataclass
 from .identifier import Identifier
 
@@ -7,7 +6,7 @@ from .identifier import Identifier
 class ProductVersion:
     @dataclass(frozen=True)
     class Price:
-        amount: Decimal
+        amount: int
         unit: str
         currency: str
 
