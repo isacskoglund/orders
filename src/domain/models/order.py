@@ -51,8 +51,10 @@ class VersionedOrder(Order):
     items: list[Item]
 
     @dataclass(frozen=True)
-    class Item(RequestedOrder.Item):
+    class Item:
+        product_id: Identifier
         product_version_id: Identifier
+        quantity: int
 
     def to_persisted_order(self, id: Identifier, status: Status | None = None):
         create_persisted_order = partial(
