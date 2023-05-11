@@ -1,7 +1,7 @@
 from __future__ import annotations
 from domain.utils.singleton_meta import SingletonMeta
 from dataclasses import dataclass
-from typing import Any, Optional, Callable, Protocol
+from typing import Callable, Protocol
 from enum import Enum, auto
 
 
@@ -87,8 +87,8 @@ class TransitionToExpectednessMapper(metaclass=SingletonMeta):
 class StatusTransition:
     from_status: Status
     to_status: Status
-    _get_expectedness: Optional[
-        Callable[[Status, Status], Expectedness]
+    _get_expectedness: Callable[
+        [Status, Status], Expectedness
     ] = TransitionToExpectednessMapper.get_expectedness
 
     @property

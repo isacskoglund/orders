@@ -12,7 +12,6 @@ from domain.models.identifier import Identifier
 from domain.models.order_status import Status
 from domain.models.order import PersistedOrder, VersionedOrder
 from domain.models.event import DispatchableEvent, StatusToEventMapperProtocol
-from typing import Callable
 from pytest import fixture
 from dataclasses import dataclass, field
 
