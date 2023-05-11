@@ -78,7 +78,5 @@ class PersistedOrder(Order):
     items: list[VersionedItem]
     status: Status = Status.PENDING
 
-    Item = VersionedItem
-
     def update_status(self, new_status: Status) -> PersistedOrder:
         return replace(self, status=new_status)
