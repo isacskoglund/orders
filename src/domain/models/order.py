@@ -31,8 +31,6 @@ class Order:
 class RequestedOrder(Order):
     items: list[Item]
 
-    Item = Item
-
     def get_product_ids(self) -> list[Identifier]:
         return [item.product_id for item in self.items]
 

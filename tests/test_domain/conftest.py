@@ -1,6 +1,11 @@
 from typing import Callable
 from domain.models.identifier import Identifier
-from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
+from domain.models.order import (
+    VersionedOrder,
+    PersistedOrder,
+    Address,
+    Item,
+)
 from pytest import fixture
 from uuid import uuid4, UUID
 from random import choice, randint
@@ -49,20 +54,18 @@ def requested_items(
     product_versions: dict[Identifier, Identifier],
     size: int = 5,
     max_quantity: int = 10,
-) -> list[RequestedOrder.Item]:
-    result: list[RequestedOrder.Item] = []
+) -> list[Item]:
+    result: list[Item] = []
     for _ in range(0, size):
         product_id = choice(list(product_versions.keys()))
-        item = RequestedOrder.Item(
-            product_id=product_id, quantity=randint(1, max_quantity)
-        )
+        item = Item(product_id=product_id, quantity=randint(1, max_quantity))
         result.append(item)
     return result
 
 
 @fixture
 def versioned_items(
-    requested_items: list[RequestedOrder.Item],
+    requested_items: list[Item],
     product_versions: dict[Identifier, Identifier],
 ) -> list[VersionedOrder.Item]:
     return [
