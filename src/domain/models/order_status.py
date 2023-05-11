@@ -1,6 +1,5 @@
 from __future__ import annotations
 from domain.utils.singleton_meta import SingletonMeta
-from dataclasses import dataclass
 from typing import Protocol
 from enum import Enum, auto
 
@@ -89,32 +88,22 @@ class TransitionToExpectednessMapper(metaclass=SingletonMeta):
         return expectedness
 
 
-@dataclass(frozen=True)
 class StatusTransition:
-    from_status: Status
-    to_status: Status
-    _expectedness_mapper: TransitionToExpectednessProtocol = (
-        TransitionToExpectednessMapper
-    )
-
-    @property
-    def _expectedness(self) -> Expectedness:
-        return self._expectedness_mapper.get_expectedness(
-            from_status=self.from_status, to_status=self.to_status
+    def __init__(
+        self,
+        from_status: Status,
+        to_status: Status,
+        _expectedness_mapper: TransitionToExpectednessProtocol = TransitionToExpectednessMapper,
+    ) -> None:
+        self.from_status = from_status
+        self.to_status = to_status
+        expectedness = _expectedness_mapper.get_expectedness(
+            from_status=from_status, to_status=to_status
         )
-
-    @property
-    def is_abnormal(self) -> bool:
-        return self._expectedness in {Expectedness.ABNORMAL}
-
-    @property
-    def is_unexpected(self) -> bool:
-        return self._expectedness in {Expectedness.ABNORMAL, Expectedness.UNEXPECTED}
-
-    @property
-    def is_foreseen(self) -> bool:
-        return self._expectedness in {Expectedness.FORESEEN, Expectedness.NEXT_UP}
-
-    @property
-    def is_next_up(self) -> bool:
-        return self._expectedness in {Expectedness.NEXT_UP}
+        self.is_abnormal = expectedness in {Expectedness.ABNORMAL}
+        self.is_unexpected = expectedness in {
+            Expectedness.ABNORMAL,
+            Expectedness.UNEXPECTED,
+        }
+        self.is_foreseen = expectedness in {Expectedness.FORESEEN, Expectedness.NEXT_UP}
+        self.is_next_up = expectedness in {Expectedness.NEXT_UP}
