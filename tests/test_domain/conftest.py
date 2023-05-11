@@ -5,7 +5,10 @@ from domain.models.order import (
     Address,
     Item,
     VersionedItem,
+    OrderData,
+    ItemWithProductVersion,
 )
+from domain.models.product import ProductVersion
 from pytest import fixture
 from uuid import uuid4, UUID
 from random import choice, randint
@@ -40,7 +43,7 @@ def address() -> Address:
 
 
 @fixture
-def product_versions(
+def product_version_ids(
     id_generator: Callable[[], Identifier], size: int = 10
 ) -> dict[Identifier, Identifier]:
     result: dict[Identifier, Identifier] = {}
@@ -51,13 +54,13 @@ def product_versions(
 
 @fixture
 def requested_items(
-    product_versions: dict[Identifier, Identifier],
+    product_version_ids: dict[Identifier, Identifier],
     size: int = 5,
     max_quantity: int = 10,
 ) -> list[Item]:
     result: list[Item] = []
     for _ in range(0, size):
-        product_id = choice(list(product_versions.keys()))
+        product_id = choice(list(product_version_ids.keys()))
         item = Item(product_id=product_id, quantity=randint(1, max_quantity))
         result.append(item)
     return result
@@ -66,13 +69,13 @@ def requested_items(
 @fixture
 def versioned_items(
     requested_items: list[Item],
-    product_versions: dict[Identifier, Identifier],
+    product_version_ids: dict[Identifier, Identifier],
 ) -> list[VersionedItem]:
     return [
         VersionedItem(
             product_id=item.product_id,
             quantity=item.quantity,
-            product_version_id=product_versions[item.product_id],
+            product_version_id=product_version_ids[item.product_id],
         )
         for item in requested_items
     ]

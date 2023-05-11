@@ -28,9 +28,9 @@ MAX_ORDER_ITEM_QUANTITY = 10
 
 @fixture
 def product_ids_to_version_ids(
-    product_versions: dict[Identifier, Identifier]
+    product_version_ids: dict[Identifier, Identifier]
 ) -> dict[Identifier, Identifier]:
-    return product_versions
+    return product_version_ids
 
 
 @fixture
