@@ -45,6 +45,8 @@ class GetProductVersionIdsDummy:
     invalid_ids: set[Identifier] = field(default_factory=set)
     ids_without_product_version_id: set[Identifier] = field(default_factory=set)
 
+    Result = GetProductVersionIdsSPI.Result
+
     def get_product_versions(
         self, product_ids: list[Identifier]
     ) -> GetProductVersionIdsSPI.Result:
