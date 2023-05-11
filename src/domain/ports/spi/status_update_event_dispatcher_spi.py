@@ -12,4 +12,4 @@ Events = (
 
 class StatusUpdateEventDispatcherSPI(Protocol):
     def dispatch_event(self, event: Events) -> None:
-        raise NotImplementedError
+        ...

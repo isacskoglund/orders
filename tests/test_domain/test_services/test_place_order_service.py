@@ -131,6 +131,7 @@ def test_place_order_service_invalid_product_id(
         save_order_spi=save_order_dummy,
         event_dispatcher=event_dispatcher_dummy,
     )
+
     # Setup:
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
     get_product_version_ids_dummy.invalid_ids = [invalid_product_id]
