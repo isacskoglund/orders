@@ -1,7 +1,7 @@
 from __future__ import annotations
 from domain.utils.singleton_meta import SingletonMeta
 from dataclasses import dataclass
-from typing import Callable, Protocol
+from typing import Protocol
 from enum import Enum, auto
 
 
@@ -28,6 +28,12 @@ class StatusTransitionProtocol(Protocol):
     is_unexpected: bool
     is_foreseen: bool
     is_next_up: bool
+
+
+class TransitionToExpectednessProtocol(Protocol):
+    @classmethod
+    def get_expectedness(cls, from_status: Status, to_status: Status) -> Expectedness:
+        ...
 
 
 class TransitionToExpectednessMapper(metaclass=SingletonMeta):
@@ -87,13 +93,13 @@ class TransitionToExpectednessMapper(metaclass=SingletonMeta):
 class StatusTransition:
     from_status: Status
     to_status: Status
-    _get_expectedness: Callable[
-        [Status, Status], Expectedness
-    ] = TransitionToExpectednessMapper.get_expectedness
+    _expectedness_mapper: TransitionToExpectednessProtocol = (
+        TransitionToExpectednessMapper
+    )
 
     @property
     def _expectedness(self) -> Expectedness:
-        return self._get_expectedness(
+        return self._expectedness_mapper.get_expectedness(
             from_status=self.from_status, to_status=self.to_status
         )
 
