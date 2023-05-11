@@ -1,7 +1,6 @@
 from typing import Callable
 from domain.models.identifier import Identifier
 from domain.models.order import (
-    VersionedOrder,
     PersistedOrder,
     Address,
     Item,
