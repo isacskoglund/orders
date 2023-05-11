@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from domain.models.identifier import Identifier
-from domain.models.order_status import StatusTransition
 
 
 class DomainError(Exception):
