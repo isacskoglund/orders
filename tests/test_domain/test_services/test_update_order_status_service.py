@@ -1,7 +1,7 @@
-from domain.models.event import StatusToEventMapper
 from domain.models.identifier import Identifier
 from domain.models.order import PersistedOrder
 from domain.models.order_status import Status, StatusTransitionProtocol
+from domain.models.event import DispatchableEvent
 from domain.ports.api.update_order_status_api import ExpectednessSetting
 from domain.services.update_order_status_service import (
     UpdateOrderStatusService,
@@ -13,7 +13,6 @@ from conftest import (
     GetOrderByOrderIdDummy,
     EventDispatcherDummy,
     StatusToEventMapperDummy,
-    EventTest,
 )
 from dataclasses import dataclass
 from typing import Callable
@@ -189,7 +188,8 @@ def test_update_order_status_success(
     transition_validator_dummy.set_valid()
     new_status = Status.ACCEPTED_BY_INVENTORY
     expected_result = persisted_order.update_status(new_status=new_status)
-    status_to_event_mapper_dummy.event_type = EventTest
+    expected_event_type = DispatchableEvent.EventType.CANCELLED
+    status_to_event_mapper_dummy.event_type = expected_event_type
 
     # Run:
     result = service.update_order_status(
@@ -199,4 +199,6 @@ def test_update_order_status_success(
     # Asserts:
     assert result == expected_result
     assert update_order_dummy.read() == {persisted_order.id: new_status}
-    assert event_dispatcher_dummy.read() == [EventTest(order=expected_result)]
+    assert event_dispatcher_dummy.read() == [
+        DispatchableEvent(order=expected_result, event_type=expected_event_type)
+    ]

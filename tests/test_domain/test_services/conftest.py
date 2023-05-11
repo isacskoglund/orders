@@ -94,15 +94,12 @@ class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
 
 @dataclass
 class StatusToEventMapperDummy(StatusToEventMapperProtocol):
-    event_type: type[DispatchableEvent] | None = None
+    event_type: DispatchableEvent.EventType | None = None
 
-    def map_status_to_event(self, status: Status) -> type[DispatchableEvent] | None:
+    def map_status_to_event_type(
+        self, status: Status
+    ) -> DispatchableEvent.EventType | None:
         return self.event_type
-
-
-@dataclass
-class EventTest(DispatchableEvent):
-    ...
 
 
 @fixture
