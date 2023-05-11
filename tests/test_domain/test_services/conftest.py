@@ -8,16 +8,20 @@ from domain.ports.spi.product_catalogue_spi import GetProductVersionIdsSPI
 from domain.ports.spi.status_update_event_dispatcher_spi import (
     StatusUpdateEventDispatcherSPI,
 )
+from domain.ports.spi.order_persistence_spi import (
+    GetOrderDataByOrderIdSPI,
+    GetOrderDataByCustomerIdSPI,
+)
 from domain.models.identifier import Identifier
 from domain.models.order_status import Status
-from domain.models.order import PersistedOrder, VersionedOrder
+from domain.models.order import OrderData, PersistedOrder, VersionedOrder
 from domain.models.event import DispatchableEvent, StatusToEventMapperProtocol
 from pytest import fixture
 from dataclasses import dataclass, field
 
 
 @dataclass
-class UpdateOrderDummy(UpdateOrderSPI):
+class UpdateOrderDummy:
     statuses: dict[Identifier, Status] = field(default_factory=dict)
 
     def update_order_status(self, order_id: Identifier, new_status: Status) -> None:
@@ -31,7 +35,7 @@ class UpdateOrderDummy(UpdateOrderSPI):
 
 
 @dataclass
-class SaveOrderDummy(SaveOrderSPI):
+class SaveOrderDummy:
     persisted_order_to_return: PersistedOrder
 
     versioned_orders_saved: list[VersionedOrder] = field(default_factory=list)
@@ -48,7 +52,7 @@ class SaveOrderDummy(SaveOrderSPI):
 
 
 @dataclass
-class GetProductVersionIdsDummy(GetProductVersionIdsSPI):
+class GetProductVersionIdsDummy:
     product_version_ids: dict[Identifier, Identifier] = field(default_factory=dict)
     invalid_ids: set[Identifier] = field(default_factory=set)
     ids_without_product_version_id: set[Identifier] = field(default_factory=set)
@@ -64,7 +68,7 @@ class GetProductVersionIdsDummy(GetProductVersionIdsSPI):
 
 
 @dataclass
-class GetOrderByOrderIdDummy(GetOrderByOrderIdSPI):
+class GetOrderByOrderIdDummy:
     orders: dict[Identifier, PersistedOrder] = field(default_factory=dict)
 
     def get_order_by_order_id(self, order_id: Identifier) -> PersistedOrder | None:
@@ -78,7 +82,7 @@ class GetOrderByOrderIdDummy(GetOrderByOrderIdSPI):
 
 
 @dataclass
-class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
+class EventDispatcherDummy:
     dispatched_events: list[DispatchableEvent] = field(default_factory=list)
 
     def dispatch_event(self, event: DispatchableEvent) -> None:
@@ -92,13 +96,29 @@ class EventDispatcherDummy(StatusUpdateEventDispatcherSPI):
 
 
 @dataclass
-class StatusToEventMapperDummy(StatusToEventMapperProtocol):
+class StatusToEventMapperDummy:
     event_type: DispatchableEvent.EventType | None = None
 
     def map_status_to_event_type(
         self, status: Status
     ) -> DispatchableEvent.EventType | None:
         return self.event_type
+
+
+@dataclass
+class OrderDataByOrderIdDummy:
+    order_data: OrderData | None = None
+
+    def get_order_data_by_order_id(self, order_id: Identifier) -> OrderData | None:
+        return self.order_data
+
+
+@dataclass
+class OrderDataByCustomerIdDummy:
+    order_data: list[OrderData] = field(default_factory=list)
+
+    def get_order_data_by_customer_id(self, customer_id: Identifier) -> list[OrderData]:
+        return self.order_data
 
 
 @fixture
@@ -129,3 +149,13 @@ def event_dispatcher_dummy() -> EventDispatcherDummy:
 @fixture
 def status_to_event_mapper_dummy() -> StatusToEventMapperDummy:
     return StatusToEventMapperDummy()
+
+
+@fixture
+def order_data_by_order_id_dummy() -> OrderDataByOrderIdDummy:
+    return OrderDataByOrderIdDummy()
+
+
+@fixture
+def order_data_by_customer_id_dummy() -> OrderDataByCustomerIdDummy:
+    return OrderDataByCustomerIdDummy()
