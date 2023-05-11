@@ -56,8 +56,6 @@ class RequestedOrder(Order):
 class VersionedOrder(Order):
     items: list[VersionedItem]
 
-    Item = VersionedItem
-
     def get_product_ids(self) -> list[Identifier]:
         return [item.product_id for item in self.items]
 
