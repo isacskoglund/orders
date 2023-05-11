@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from domain.models.identifier import Identifier
-from domain.models.order import PersistedOrder
+from domain.models.order import OrderData
 
 
-class GetOrderByOrderIdAPI(ABC):
+class GetOrderDataByOrderIdAPI(ABC):
     @abstractmethod
-    def get_order_by_order_id(self, order_id: Identifier) -> PersistedOrder:
+    def get_order_by_order_id(self, order_id: Identifier) -> OrderData:
         """
         Raises:
             InvalidOrderIdError
@@ -14,9 +14,9 @@ class GetOrderByOrderIdAPI(ABC):
         ...
 
 
-class GetOrderByCustomerIdAPI(ABC):
+class GetOrderDataByCustomerIdAPI(ABC):
     @abstractmethod
-    def get_order_by_customer_id(self, customer_id: Identifier) -> list[PersistedOrder]:
+    def get_order_by_customer_id(self, customer_id: Identifier) -> list[OrderData]:
         """
         Raises:
             ReadFromPersistenceError
