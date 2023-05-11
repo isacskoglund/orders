@@ -15,30 +15,30 @@ class AddressTest(Address):
 
 
 @fixture
-def id_generator() -> Callable[[], IdentifierTest]:
+def id_generator() -> Callable[[], Identifier]:
     return lambda: IdentifierTest()
 
 
 @fixture
-def address_generator() -> Callable[[], AddressTest]:
+def address_generator() -> Callable[[], Address]:
     return lambda: AddressTest()
 
 
 @fixture
-def identifier() -> IdentifierTest:
+def identifier() -> Identifier:
     return IdentifierTest()
 
 
 @fixture
-def address() -> AddressTest:
+def address() -> Address:
     return AddressTest()
 
 
 @fixture
 def product_versions(
     id_generator: Callable[[], Identifier], size: int = 10
-) -> dict[IdentifierTest, IdentifierTest]:
-    result = {}
+) -> dict[Identifier, Identifier]:
+    result: dict[Identifier, Identifier] = {}
     for _ in range(0, size):
         result[id_generator()] = id_generator()
     return result
@@ -46,11 +46,11 @@ def product_versions(
 
 @fixture
 def requested_items(
-    product_versions: dict[IdentifierTest, IdentifierTest],
+    product_versions: dict[Identifier, Identifier],
     size: int = 5,
     max_quantity: int = 10,
 ) -> list[RequestedOrder.Item]:
-    result = []
+    result: list[RequestedOrder.Item] = []
     for _ in range(0, size):
         product_id = choice(list(product_versions.keys()))
         item = RequestedOrder.Item(
@@ -63,7 +63,7 @@ def requested_items(
 @fixture
 def versioned_items(
     requested_items: list[RequestedOrder.Item],
-    product_versions: dict[IdentifierTest, IdentifierTest],
+    product_versions: dict[Identifier, Identifier],
 ) -> list[VersionedOrder.Item]:
     return [
         VersionedOrder.Item(
