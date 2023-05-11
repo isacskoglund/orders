@@ -1,21 +1,9 @@
 from __future__ import annotations
-from domain.ports.spi.order_persistence_spi import (
-    GetOrderByOrderIdSPI,
-    UpdateOrderSPI,
-    SaveOrderSPI,
-)
 from domain.ports.spi.product_catalogue_spi import GetProductVersionIdsSPI
-from domain.ports.spi.status_update_event_dispatcher_spi import (
-    StatusUpdateEventDispatcherSPI,
-)
-from domain.ports.spi.order_persistence_spi import (
-    GetOrderDataByOrderIdSPI,
-    GetOrderDataByCustomerIdSPI,
-)
 from domain.models.identifier import Identifier
 from domain.models.order_status import Status
 from domain.models.order import OrderData, PersistedOrder, VersionedOrder
-from domain.models.event import DispatchableEvent, StatusToEventMapperProtocol
+from domain.models.event import DispatchableEvent
 from pytest import fixture
 from dataclasses import dataclass, field
 
