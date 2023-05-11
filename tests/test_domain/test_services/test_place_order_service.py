@@ -1,6 +1,12 @@
 from domain.services.place_order_service import PlaceOrderService
 from domain.models.identifier import Identifier
-from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
+from domain.models.order import (
+    RequestedOrder,
+    VersionedOrder,
+    PersistedOrder,
+    Address,
+    Item,
+)
 from domain.models.event import DispatchableEvent
 from domain.errors import InvalidProductIdError, NoCurrentProductVersionError
 from conftest import (
@@ -43,20 +49,16 @@ def valid_product_id_with_missing_product_version(
 
 
 @fixture
-def valid_items(
-    product_ids_to_version_ids: dict[Identifier, Identifier]
-) -> list[RequestedOrder.Item]:
+def valid_items(product_ids_to_version_ids: dict[Identifier, Identifier]) -> list[Item]:
     return [
-        RequestedOrder.Item(
-            product_id=product_id, quantity=randint(0, MAX_ORDER_ITEM_QUANTITY)
-        )
+        Item(product_id=product_id, quantity=randint(0, MAX_ORDER_ITEM_QUANTITY))
         for product_id in product_ids_to_version_ids
     ]
 
 
 @fixture
-def invalid_item(invalid_product_id: Identifier) -> RequestedOrder.Item:
-    return RequestedOrder.Item(
+def invalid_item(invalid_product_id: Identifier) -> Item:
+    return Item(
         product_id=invalid_product_id, quantity=randint(0, MAX_ORDER_ITEM_QUANTITY)
     )
 
@@ -64,8 +66,8 @@ def invalid_item(invalid_product_id: Identifier) -> RequestedOrder.Item:
 @fixture
 def valid_item_with_missing_product_version(
     valid_product_id_with_missing_product_version: Identifier,
-) -> RequestedOrder.Item:
-    return RequestedOrder.Item(
+) -> Item:
+    return Item(
         product_id=valid_product_id_with_missing_product_version,
         quantity=randint(0, MAX_ORDER_ITEM_QUANTITY),
     )
@@ -76,7 +78,7 @@ def valid_item_with_missing_product_version(
 
 @fixture
 def valid_order(
-    valid_items: list[RequestedOrder.Item],
+    valid_items: list[Item],
     id_generator: Callable[[], Identifier],
     address_generator: Callable[[], Address],
 ) -> RequestedOrder:
@@ -89,8 +91,8 @@ def valid_order(
 
 @fixture
 def invalid_order(
-    valid_items: list[RequestedOrder.Item],
-    invalid_item: RequestedOrder.Item,
+    valid_items: list[Item],
+    invalid_item: Item,
     id_generator: Callable[[], Identifier],
     address_generator: Callable[[], Address],
 ) -> RequestedOrder:
@@ -103,8 +105,8 @@ def invalid_order(
 
 @fixture
 def valid_order_with_missing_product_version(
-    valid_items: list[RequestedOrder.Item],
-    valid_item_with_missing_product_version: RequestedOrder.Item,
+    valid_items: list[Item],
+    valid_item_with_missing_product_version: Item,
     id_generator: Callable[[], Identifier],
     address_generator: Callable[[], Address],
 ) -> RequestedOrder:

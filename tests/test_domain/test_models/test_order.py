@@ -1,12 +1,18 @@
 from typing import Callable
-from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
+from domain.models.order import (
+    RequestedOrder,
+    VersionedOrder,
+    PersistedOrder,
+    Address,
+    Item,
+)
 from domain.models.order_status import Status
 from domain.models.identifier import Identifier
 
 
 def test_requested_order(
     product_versions: dict[Identifier, Identifier],
-    requested_items: list[RequestedOrder.Item],
+    requested_items: list[Item],
     versioned_items: list[VersionedOrder.Item],
     id_generator: Callable[[], Identifier],
     address: Address,
