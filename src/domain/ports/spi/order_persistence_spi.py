@@ -6,11 +6,19 @@ from domain.models.order_status import Status
 
 class GetOrderByOrderIdSPI(Protocol):
     def get_order_by_order_id(self, order_id: Identifier) -> PersistedOrder | None:
+        """
+        Raises:
+            ReadFromPersistenceError
+        """
         ...
 
 
 class GetOrderDataByOrderIdSPI(Protocol):
     def get_order_data_by_order_id(self, order_id: Identifier) -> OrderData | None:
+        """
+        Raises:
+            ReadFromPersistenceError
+        """
         ...
 
 
@@ -18,11 +26,19 @@ class GetOrdersByCustomerIdSPI(Protocol):
     def get_orders_by_customer_id(
         self, customer_id: Identifier
     ) -> list[PersistedOrder]:
+        """
+        Raises:
+            ReadFromPersistenceError
+        """
         ...
 
 
 class GetOrderDataByCustomerIdSPI(Protocol):
     def get_order_data_by_customer_id(self, customer_id: Identifier) -> list[OrderData]:
+        """
+        Raises:
+            ReadFromPersistenceError
+        """
         ...
 
 
