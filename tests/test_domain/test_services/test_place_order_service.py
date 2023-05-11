@@ -1,6 +1,6 @@
 from domain.services.place_order_service import PlaceOrderService
 from domain.models.identifier import Identifier
-from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder
+from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder, Address
 from domain.models.event import DispatchableEvent
 from domain.errors import InvalidProductIdError, NoCurrentProductVersionError
 from conftest import (
@@ -55,7 +55,7 @@ def valid_items(
 
 
 @fixture
-def invalid_item(invalid_product_id) -> RequestedOrder.Item:
+def invalid_item(invalid_product_id: Identifier) -> RequestedOrder.Item:
     return RequestedOrder.Item(
         product_id=invalid_product_id, quantity=randint(0, MAX_ORDER_ITEM_QUANTITY)
     )
@@ -63,7 +63,7 @@ def invalid_item(invalid_product_id) -> RequestedOrder.Item:
 
 @fixture
 def valid_item_with_missing_product_version(
-    valid_product_id_with_missing_product_version,
+    valid_product_id_with_missing_product_version: Identifier,
 ) -> RequestedOrder.Item:
     return RequestedOrder.Item(
         product_id=valid_product_id_with_missing_product_version,
@@ -75,7 +75,11 @@ def valid_item_with_missing_product_version(
 
 
 @fixture
-def valid_order(valid_items, id_generator, address_generator) -> RequestedOrder:
+def valid_order(
+    valid_items: list[RequestedOrder.Item],
+    id_generator: Callable[[], Identifier],
+    address_generator: Callable[[], Address],
+) -> RequestedOrder:
     return RequestedOrder(
         customer_id=id_generator(),
         shipping_address=address_generator(),
@@ -85,7 +89,10 @@ def valid_order(valid_items, id_generator, address_generator) -> RequestedOrder:
 
 @fixture
 def invalid_order(
-    valid_items, invalid_item, id_generator, address_generator
+    valid_items: list[RequestedOrder.Item],
+    invalid_item: RequestedOrder.Item,
+    id_generator: Callable[[], Identifier],
+    address_generator: Callable[[], Address],
 ) -> RequestedOrder:
     return RequestedOrder(
         customer_id=id_generator(),
@@ -96,10 +103,10 @@ def invalid_order(
 
 @fixture
 def valid_order_with_missing_product_version(
-    valid_items,
-    valid_item_with_missing_product_version,
-    id_generator,
-    address_generator,
+    valid_items: list[RequestedOrder.Item],
+    valid_item_with_missing_product_version: RequestedOrder.Item,
+    id_generator: Callable[[], Identifier],
+    address_generator: Callable[[], Address],
 ) -> RequestedOrder:
     return RequestedOrder(
         customer_id=id_generator(),
@@ -110,7 +117,8 @@ def valid_order_with_missing_product_version(
 
 @fixture
 def valid_versioned_order(
-    valid_order: RequestedOrder, product_ids_to_version_ids
+    valid_order: RequestedOrder,
+    product_ids_to_version_ids: dict[Identifier, Identifier],
 ) -> VersionedOrder:
     return valid_order.to_versioned_order(product_versions=product_ids_to_version_ids)
 
@@ -134,7 +142,7 @@ def test_place_order_service_invalid_product_id(
 
     # Setup:
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
-    get_product_version_ids_dummy.invalid_ids = [invalid_product_id]
+    get_product_version_ids_dummy.invalid_ids = {invalid_product_id}
 
     # Run:
     with pytest.raises(InvalidProductIdError) as error_info:
@@ -161,9 +169,9 @@ def test_place_order_service_valid_id_without_version(
     )
     # Setup
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
-    get_product_version_ids_dummy.ids_without_product_version_id = [
+    get_product_version_ids_dummy.ids_without_product_version_id = {
         valid_product_id_with_missing_product_version
-    ]
+    }
 
     # Run:
     with pytest.raises(NoCurrentProductVersionError) as error_info:
