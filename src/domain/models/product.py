@@ -11,14 +11,9 @@ class ProductVersion:
         unit: str
         currency: str
 
-    @dataclass(frozen=True)
-    class Data:
-        pass
-
     id: Identifier
     product_id: Identifier
     price: Price
-    data: Data
 
 
 @dataclass(frozen=True)
