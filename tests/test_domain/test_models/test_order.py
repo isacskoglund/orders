@@ -5,6 +5,7 @@ from domain.models.order import (
     PersistedOrder,
     Address,
     Item,
+    VersionedItem,
 )
 from domain.models.order_status import Status
 from domain.models.identifier import Identifier
@@ -13,7 +14,7 @@ from domain.models.identifier import Identifier
 def test_requested_order(
     product_versions: dict[Identifier, Identifier],
     requested_items: list[Item],
-    versioned_items: list[VersionedOrder.Item],
+    versioned_items: list[VersionedItem],
     id_generator: Callable[[], Identifier],
     address: Address,
 ) -> None:
@@ -37,7 +38,7 @@ def test_requested_order(
 
 
 def test_versioned_order(
-    versioned_items: list[VersionedOrder.Item],
+    versioned_items: list[VersionedItem],
     id_generator: Callable[[], Identifier],
     address: Address,
 ) -> None:
@@ -70,7 +71,7 @@ def test_versioned_order(
 
 
 def test_persisted_order(
-    versioned_items: list[VersionedOrder.Item],
+    versioned_items: list[VersionedItem],
     id_generator: Callable[[], Identifier],
     address: Address,
 ) -> None:

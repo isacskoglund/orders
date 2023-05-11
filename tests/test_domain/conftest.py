@@ -5,6 +5,7 @@ from domain.models.order import (
     PersistedOrder,
     Address,
     Item,
+    VersionedItem,
 )
 from pytest import fixture
 from uuid import uuid4, UUID
@@ -67,9 +68,9 @@ def requested_items(
 def versioned_items(
     requested_items: list[Item],
     product_versions: dict[Identifier, Identifier],
-) -> list[VersionedOrder.Item]:
+) -> list[VersionedItem]:
     return [
-        VersionedOrder.Item(
+        VersionedItem(
             product_id=item.product_id,
             quantity=item.quantity,
             product_version_id=product_versions[item.product_id],
@@ -82,7 +83,7 @@ def versioned_items(
 def persisted_order(
     id_generator: Callable[[], Identifier],
     address: Address,
-    versioned_items: list[VersionedOrder.Item],
+    versioned_items: list[VersionedItem],
 ) -> PersistedOrder:
     order_id = id_generator()
     customer_id = id_generator()
