@@ -13,7 +13,11 @@ from domain.models.order_status import (
     StatusTransition,
     StatusTransitionProtocol,
 )
-from domain.models.event import StatusToEventMapper, StatusToEventMapperProtocol
+from domain.models.event import (
+    StatusToEventMapper,
+    StatusToEventMapperProtocol,
+    DispatchableEvent,
+)
 from domain.errors import InvalidOrderIdError, InsufficientExpectednessError
 from typing import Callable
 
@@ -83,8 +87,10 @@ class UpdateOrderStatusService(UpdateOrderStatusAPI):
     ) -> PersistedOrder:
         self._save_new_status(order_id=order.id, new_status=new_status)
         updated_order = order.update_status(new_status=new_status)
-        event_type = self._event_mapper.map_status_to_event(status=updated_order.status)
+        event_type = self._event_mapper.map_status_to_event_type(
+            status=updated_order.status
+        )
         if event_type is not None:
-            event = event_type(order=updated_order)
+            event = DispatchableEvent(order=updated_order, event_type=event_type)
             self._dispatch_event(event=event)
         return updated_order
