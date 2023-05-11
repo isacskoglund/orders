@@ -18,9 +18,17 @@ class GetOrdersByCustomerIdSPI(Protocol):
 
 class SaveOrderSPI(Protocol):
     def save_order(self, versioned_order: VersionedOrder) -> PersistedOrder:
+        """
+        Raises:
+            SaveOrderError
+        """
         ...
 
 
 class UpdateOrderSPI(Protocol):
     def update_order_status(self, order_id: Identifier, new_status: Status) -> None:
+        """
+        Raises:
+            UpdateOrderError
+        """
         ...
