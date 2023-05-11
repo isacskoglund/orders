@@ -20,7 +20,7 @@ class TestStatusTransition:
     transition = StatusTransition(
         from_status=Status.PENDING,
         to_status=Status.ACCEPTED_BY_INVENTORY,
-        _get_expectedness=mapper_dummy.get_expectedness,
+        _expectedness_mapper=mapper_dummy,
     )
 
     def test_expectedness(self) -> None:
@@ -57,10 +57,7 @@ class TestStatusTransition:
         transition = StatusTransition(
             from_status=Status.PENDING, to_status=Status.ACCEPTED_BY_INVENTORY
         )
-        assert (
-            transition._get_expectedness
-            == TransitionToExpectednessMapper.get_expectedness
-        )
+        assert transition._expectedness_mapper == TransitionToExpectednessMapper
 
 
 class TestTransitionToExpectednessMapper:
