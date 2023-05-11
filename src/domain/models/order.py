@@ -11,6 +11,17 @@ class Address:
 
 
 @dataclass(frozen=True)
+class Item:
+    product_id: Identifier
+    quantity: int
+
+
+@dataclass(frozen=True)
+class VersionedItem(Item):
+    product_version_id: Identifier
+
+
+@dataclass(frozen=True)
 class Order:
     customer_id: Identifier
     shipping_address: Address
@@ -20,10 +31,7 @@ class Order:
 class RequestedOrder(Order):
     items: list[Item]
 
-    @dataclass(frozen=True)
-    class Item:
-        product_id: Identifier
-        quantity: int
+    Item = Item
 
     def get_product_ids(self) -> list[Identifier]:
         return [item.product_id for item in self.items]
@@ -32,7 +40,7 @@ class RequestedOrder(Order):
         self, product_versions: dict[Identifier, Identifier]
     ) -> VersionedOrder:
         items = [
-            VersionedOrder.Item(
+            VersionedItem(
                 product_id=item.product_id,
                 quantity=item.quantity,
                 product_version_id=product_versions[item.product_id],
@@ -48,13 +56,12 @@ class RequestedOrder(Order):
 
 @dataclass(frozen=True)
 class VersionedOrder(Order):
-    items: list[Item]
+    items: list[VersionedItem]
 
-    @dataclass(frozen=True)
-    class Item:
-        product_id: Identifier
-        product_version_id: Identifier
-        quantity: int
+    Item = VersionedItem
+
+    def get_product_ids(self) -> list[Identifier]:
+        return [item.product_id for item in self.items]
 
     def to_persisted_order(self, id: Identifier, status: Status | None = None):
         create_persisted_order = partial(
@@ -70,9 +77,12 @@ class VersionedOrder(Order):
 
 
 @dataclass(frozen=True)
-class PersistedOrder(VersionedOrder):
+class PersistedOrder(Order):
     id: Identifier
+    items: list[VersionedItem]
     status: Status = Status.PENDING
+
+    Item = VersionedItem
 
     def update_status(self, new_status: Status) -> PersistedOrder:
         return replace(self, status=new_status)
