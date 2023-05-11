@@ -69,3 +69,10 @@ class UpdateOrderError(DomainError):
     """
 
     order_id: Identifier
+
+
+@dataclass(frozen=True)
+class ReadFromPersistenceError(DomainError):
+    """
+    Could not read from persistence.
+    """
