@@ -1,13 +1,12 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 from domain.models.order import RequestedOrder, PersistedOrder
 
 
-class PlaceOrderAPI(Protocol):
+class PlaceOrderAPI(ABC):
+    @abstractmethod
     def place_order(self, requested_order: RequestedOrder) -> PersistedOrder:
         """
         Raises:
            InvalidProductIdError
            NoCurrentProductVersionError
         """
-
-        raise NotImplementedError

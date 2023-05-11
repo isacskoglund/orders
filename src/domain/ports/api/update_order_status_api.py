@@ -1,4 +1,4 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 from domain.models.identifier import Identifier
 from domain.models.order import PersistedOrder
 from domain.models.order_status import Status
@@ -12,7 +12,8 @@ class ExpectednessSetting(Enum):
     ALLOW_ABNORMAL = auto()
 
 
-class UpdateOrderStatusAPI(Protocol):
+class UpdateOrderStatusAPI(ABC):
+    @abstractmethod
     def update_order_status(
         self,
         order_id: Identifier,
@@ -24,4 +25,3 @@ class UpdateOrderStatusAPI(Protocol):
            InvalidOrderIdError
            InsufficientExpectednessError
         """
-        raise NotImplementedError
