@@ -1,13 +1,13 @@
 from domain.services.place_order_service import PlaceOrderService
 from domain.models.identifier import Identifier
 from domain.models.order import RequestedOrder, VersionedOrder, PersistedOrder
+from domain.models.event import DispatchableEvent
 from domain.errors import InvalidProductIdError, NoCurrentProductVersionError
 from conftest import (
     SaveOrderDummy,
     GetProductVersionIdsDummy,
     EventDispatcherDummy,
     StatusToEventMapperDummy,
-    EventTest,
 )
 from typing import Callable
 from random import randint
@@ -193,7 +193,8 @@ def test_place_order_service_success(
     )
 
     # Setup:
-    status_to_event_mapper_dummy.event_type = EventTest
+    expected_event_type = DispatchableEvent.EventType.CANCELLED
+    status_to_event_mapper_dummy.event_type = expected_event_type
     get_product_version_ids_dummy.product_version_ids = product_ids_to_version_ids
 
     # Run:
@@ -202,4 +203,6 @@ def test_place_order_service_success(
     # Asserts:
     assert persisted_order_result == persisted_order
     assert save_order_dummy.read() == [valid_versioned_order]
-    assert event_dispatcher_dummy.read() == [EventTest(order=persisted_order)]
+    assert event_dispatcher_dummy.read() == [
+        DispatchableEvent(order=persisted_order, event_type=expected_event_type)
+    ]

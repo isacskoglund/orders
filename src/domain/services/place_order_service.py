@@ -1,5 +1,9 @@
 from domain.models.order import PersistedOrder, VersionedOrder, RequestedOrder
-from domain.models.event import StatusToEventMapperProtocol, StatusToEventMapper
+from domain.models.event import (
+    StatusToEventMapperProtocol,
+    StatusToEventMapper,
+    DispatchableEvent,
+)
 from domain.ports.api.place_order_api import PlaceOrderAPI
 from domain.ports.spi.product_catalogue_spi import GetProductVersionIdsSPI
 from domain.ports.spi.order_persistence_spi import SaveOrderSPI
@@ -23,11 +27,11 @@ class PlaceOrderService(PlaceOrderAPI):
         persisted_order = self.save_order_spi.save_order(
             versioned_order=versioned_order
         )
-        event_type = self._event_mapper.map_status_to_event(
+        event_type = self._event_mapper.map_status_to_event_type(
             status=persisted_order.status
         )
         if event_type is not None:
-            event = event_type(order=persisted_order)
+            event = DispatchableEvent(order=persisted_order, event_type=event_type)
             self.event_dispatcher.dispatch_event(event=event)
         return persisted_order
 
