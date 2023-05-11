@@ -17,15 +17,13 @@ class Order:
 
 
 @dataclass(frozen=True)
-class RequestedOrder:
+class RequestedOrder(Order):
+    items: list[Item]
+
     @dataclass(frozen=True)
     class Item:
         product_id: Identifier
         quantity: int
-
-    customer_id: Identifier
-    shipping_address: Address
-    items: list[Item]
 
     def get_product_ids(self) -> list[Identifier]:
         return [item.product_id for item in self.items]
