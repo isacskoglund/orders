@@ -1,6 +1,7 @@
 from __future__ import annotations
 from .identifier import Identifier
 from .order_status import Status
+from .product import ProductVersion
 from dataclasses import dataclass, replace
 from functools import partial
 
@@ -19,6 +20,11 @@ class Item:
 @dataclass(frozen=True)
 class VersionedItem(Item):
     product_version_id: Identifier
+
+
+@dataclass(frozen=True)
+class ItemWithProductVersion(Item):
+    product_version: ProductVersion
 
 
 @dataclass(frozen=True)
@@ -80,3 +86,10 @@ class PersistedOrder(Order):
 
     def update_status(self, new_status: Status) -> PersistedOrder:
         return replace(self, status=new_status)
+
+
+@dataclass(frozen=True)
+class OrderData(Order):
+    id: Identifier
+    items: list[ItemWithProductVersion]
+    status: Status
