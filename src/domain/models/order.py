@@ -2,11 +2,18 @@ from __future__ import annotations
 from .identifier import Identifier
 from .order_status import Status
 from dataclasses import dataclass, replace
+from functools import partial
 
 
 @dataclass(frozen=True)
 class Address:
     pass
+
+
+@dataclass(frozen=True)
+class Order:
+    customer_id: Identifier
+    shipping_address: Address
 
 
 @dataclass(frozen=True)
@@ -42,7 +49,7 @@ class RequestedOrder:
 
 
 @dataclass(frozen=True)
-class VersionedOrder(RequestedOrder):
+class VersionedOrder(Order):
     items: list[Item]
 
     @dataclass(frozen=True)
@@ -50,16 +57,16 @@ class VersionedOrder(RequestedOrder):
         product_version_id: Identifier
 
     def to_persisted_order(self, id: Identifier, status: Status | None = None):
-        args = {
-            "customer_id": self.customer_id,
-            "shipping_address": self.shipping_address,
-            "items": self.items,
-            "id": id,
-        }
-        if status is not None:
-            args["status"] = status
-
-        return PersistedOrder(**args)
+        create_persisted_order = partial(
+            PersistedOrder,
+            customer_id=self.customer_id,
+            shipping_address=self.shipping_address,
+            items=self.items,
+            id=id,
+        )
+        if status is None:
+            return create_persisted_order()
+        return create_persisted_order(status=status)
 
 
 @dataclass(frozen=True)
