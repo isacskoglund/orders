@@ -42,7 +42,7 @@ def test_by_customer_id_service_empty(
     assert result == []
 
 
-def test_by_order_id_service_success(
+def test_by_customer_id_service_success(
     order_data_by_customer_id_dummy: OrderDataByCustomerIdDummy, order_data: OrderData
 ) -> None:
     service = OrderDataByCustomerIdService(
