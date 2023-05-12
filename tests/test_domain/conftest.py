@@ -11,7 +11,7 @@ from domain.models.order import (
 from domain.models.product import ProductVersion
 from pytest import fixture
 from uuid import uuid4, UUID
-from random import choice, randint
+from random import randint
 
 MAX_PRICE = 10
 ITEM_COUNT = 10
@@ -88,15 +88,15 @@ def requested_items(
 def versioned_items(
     requested_items: dict[Identifier, Item],
     product_version_ids: dict[Identifier, Identifier],
-) -> list[VersionedItem]:
-    return [
-        VersionedItem(
+) -> dict[Identifier, VersionedItem]:
+    return {
+        product_id: VersionedItem(
             product_id=product_id,
             quantity=item.quantity,
             product_version_id=product_version_ids[product_id],
         )
         for product_id, item in requested_items.items()
-    ]
+    }
 
 
 @fixture
@@ -109,7 +109,7 @@ def items_with_product_versions(
     for product_id in product_version_ids.keys():
         result[product_id] = ItemWithProductVersion(
             product_id=product_id,
-            quantity=randint(1, MAX_ITEM_QTY),
+            quantity=randint(1, max_item_qty),
             product_version=product_versions[product_id],
         )
     return result
@@ -119,14 +119,14 @@ def items_with_product_versions(
 def persisted_order(
     id_generator: Callable[[], Identifier],
     address: Address,
-    versioned_items: list[VersionedItem],
+    versioned_items: dict[Identifier, VersionedItem],
 ) -> PersistedOrder:
     order_id = id_generator()
     customer_id = id_generator()
     order = PersistedOrder(
         id=order_id,
         customer_id=customer_id,
-        items=versioned_items,
+        items=list(versioned_items.values()),
         shipping_address=address,
     )
     return order
