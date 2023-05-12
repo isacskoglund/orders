@@ -129,13 +129,14 @@ def valid_versioned_order(
 
 
 def test_place_order_service_invalid_product_id(
-    get_product_version_ids_dummy: GetProductVersionIdsDummy,
-    save_order_dummy: SaveOrderDummy,
-    event_dispatcher_dummy: EventDispatcherDummy,
     product_ids_to_version_ids: dict[Identifier, Identifier],
     invalid_product_id: Identifier,
     invalid_order: RequestedOrder,
+    persisted_order: PersistedOrder,
 ) -> None:
+    get_product_version_ids_dummy = GetProductVersionIdsDummy()
+    save_order_dummy = SaveOrderDummy(persisted_order_to_return=persisted_order)
+    event_dispatcher_dummy = EventDispatcherDummy()
     service = PlaceOrderService(
         get_product_version_ids_spi=get_product_version_ids_dummy,
         save_order_spi=save_order_dummy,
@@ -157,13 +158,14 @@ def test_place_order_service_invalid_product_id(
 
 
 def test_place_order_service_valid_id_without_version(
-    get_product_version_ids_dummy: GetProductVersionIdsDummy,
-    save_order_dummy: SaveOrderDummy,
-    event_dispatcher_dummy: EventDispatcherDummy,
     product_ids_to_version_ids: dict[Identifier, Identifier],
     valid_product_id_with_missing_product_version: Identifier,
     valid_order_with_missing_product_version: RequestedOrder,
+    persisted_order: PersistedOrder,
 ) -> None:
+    get_product_version_ids_dummy = GetProductVersionIdsDummy()
+    save_order_dummy = SaveOrderDummy(persisted_order_to_return=persisted_order)
+    event_dispatcher_dummy = EventDispatcherDummy()
     service = PlaceOrderService(
         get_product_version_ids_spi=get_product_version_ids_dummy,
         save_order_spi=save_order_dummy,
@@ -186,15 +188,15 @@ def test_place_order_service_valid_id_without_version(
 
 
 def test_place_order_service_success(
-    get_product_version_ids_dummy: GetProductVersionIdsDummy,
-    save_order_dummy: SaveOrderDummy,
-    event_dispatcher_dummy: EventDispatcherDummy,
     product_ids_to_version_ids: dict[Identifier, Identifier],
     valid_order: RequestedOrder,
     valid_versioned_order: VersionedOrder,
-    status_to_event_mapper_dummy: StatusToEventMapperDummy,
     persisted_order: PersistedOrder,
 ) -> None:
+    get_product_version_ids_dummy = GetProductVersionIdsDummy()
+    save_order_dummy = SaveOrderDummy(persisted_order_to_return=persisted_order)
+    event_dispatcher_dummy = EventDispatcherDummy()
+    status_to_event_mapper_dummy = StatusToEventMapperDummy()
     service = PlaceOrderService(
         get_product_version_ids_spi=get_product_version_ids_dummy,
         save_order_spi=save_order_dummy,

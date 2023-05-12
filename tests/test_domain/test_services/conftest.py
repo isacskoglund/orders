@@ -4,7 +4,6 @@ from domain.models.identifier import Identifier
 from domain.models.order_status import Status
 from domain.models.order import OrderData, PersistedOrder, VersionedOrder
 from domain.models.event import DispatchableEvent
-from pytest import fixture
 from dataclasses import dataclass, field
 
 
@@ -109,43 +108,3 @@ class OrderDataByCustomerIdDummy:
 
     def get_order_data_by_customer_id(self, customer_id: Identifier) -> list[OrderData]:
         return self.order_data_list
-
-
-@fixture
-def update_order_dummy() -> UpdateOrderDummy:
-    return UpdateOrderDummy()
-
-
-@fixture
-def save_order_dummy(persisted_order: PersistedOrder) -> SaveOrderDummy:
-    return SaveOrderDummy(persisted_order_to_return=persisted_order)
-
-
-@fixture
-def get_product_version_ids_dummy() -> GetProductVersionIdsDummy:
-    return GetProductVersionIdsDummy()
-
-
-@fixture
-def get_order_by_id_dummy() -> GetOrderByOrderIdDummy:
-    return GetOrderByOrderIdDummy()
-
-
-@fixture
-def event_dispatcher_dummy() -> EventDispatcherDummy:
-    return EventDispatcherDummy()
-
-
-@fixture
-def status_to_event_mapper_dummy() -> StatusToEventMapperDummy:
-    return StatusToEventMapperDummy()
-
-
-@fixture
-def order_data_by_order_id_dummy() -> OrderDataByOrderIdDummy:
-    return OrderDataByOrderIdDummy()
-
-
-@fixture
-def order_data_by_customer_id_dummy() -> OrderDataByCustomerIdDummy:
-    return OrderDataByCustomerIdDummy()
