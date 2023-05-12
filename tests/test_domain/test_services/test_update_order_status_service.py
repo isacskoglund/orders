@@ -8,7 +8,7 @@ from domain.services.update_order_status_service import (
     TransitionValidator,
 )
 from domain.errors import InvalidOrderIdError, InsufficientExpectednessError
-from conftest import (
+from test_domain.dummies import (
     UpdateOrderDummy,
     GetOrderByOrderIdDummy,
     EventDispatcherDummy,

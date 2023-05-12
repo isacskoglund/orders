@@ -4,7 +4,7 @@ from domain.services.order_data_service import (
 )
 from domain.models.order import OrderData
 from domain.errors import InvalidOrderIdError
-from conftest import OrderDataByOrderIdDummy, OrderDataByCustomerIdDummy
+from test_domain.dummies import OrderDataByOrderIdDummy, OrderDataByCustomerIdDummy
 import pytest
 
 
