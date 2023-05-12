@@ -14,7 +14,7 @@ from domain.models.identifier import Identifier
 def test_requested_order(
     product_version_ids: dict[Identifier, Identifier],
     requested_items: dict[Identifier, Item],
-    versioned_items: list[VersionedItem],
+    versioned_items: dict[Identifier, VersionedItem],
     id_generator: Callable[[], Identifier],
     address: Address,
 ) -> None:
@@ -34,7 +34,7 @@ def test_requested_order(
     ]
     assert versioned_order.customer_id == customer_id
     assert versioned_order.shipping_address == address
-    assert versioned_order.items == versioned_items
+    assert versioned_order.items == list(versioned_items.values())
 
 
 def test_versioned_order(
