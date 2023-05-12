@@ -75,29 +75,27 @@ def product_versions(
 @fixture
 def requested_items(
     product_version_ids: dict[Identifier, Identifier],
-    item_count: int = ITEM_COUNT,
     max_item_qty: int = MAX_ITEM_QTY,
-) -> list[Item]:
-    result: list[Item] = []
-    for _ in range(0, item_count):
-        product_id = choice(list(product_version_ids.keys()))
+) -> dict[Identifier, Item]:
+    result: dict[Identifier, Item] = {}
+    for product_id in product_version_ids.keys():
         item = Item(product_id=product_id, quantity=randint(1, max_item_qty))
-        result.append(item)
+        result[product_id] = item
     return result
 
 
 @fixture
 def versioned_items(
-    requested_items: list[Item],
+    requested_items: dict[Identifier, Item],
     product_version_ids: dict[Identifier, Identifier],
 ) -> list[VersionedItem]:
     return [
         VersionedItem(
-            product_id=item.product_id,
+            product_id=product_id,
             quantity=item.quantity,
-            product_version_id=product_version_ids[item.product_id],
+            product_version_id=product_version_ids[product_id],
         )
-        for item in requested_items
+        for product_id, item in requested_items.items()
     ]
 
 

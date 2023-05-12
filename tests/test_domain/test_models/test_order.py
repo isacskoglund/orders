@@ -13,7 +13,7 @@ from domain.models.identifier import Identifier
 
 def test_requested_order(
     product_version_ids: dict[Identifier, Identifier],
-    requested_items: list[Item],
+    requested_items: dict[Identifier, Item],
     versioned_items: list[VersionedItem],
     id_generator: Callable[[], Identifier],
     address: Address,
@@ -22,7 +22,7 @@ def test_requested_order(
     requested_order = RequestedOrder(
         customer_id=customer_id,
         shipping_address=address,
-        items=requested_items,
+        items=list(requested_items.values()),
     )
 
     versioned_order = requested_order.to_versioned_order(
@@ -30,7 +30,7 @@ def test_requested_order(
     )
 
     assert requested_order.get_product_ids() == [
-        item.product_id for item in requested_items
+        item.product_id for item in requested_items.values()
     ]
     assert versioned_order.customer_id == customer_id
     assert versioned_order.shipping_address == address
