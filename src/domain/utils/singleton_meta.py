@@ -1,13 +1,16 @@
-from typing import Any
+from __future__ import annotations
+from typing import Any, TypeVar, Generic
+
+_T = TypeVar("_T")
 
 
-class SingletonMeta(type):
+class SingletonMeta(type, Generic[_T]):
 
     """
     Metaclass for creating singleton classes.
     """
 
-    _instances = {}
+    _instances: dict[SingletonMeta[_T], _T] = {}
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:
