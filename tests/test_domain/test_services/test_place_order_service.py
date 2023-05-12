@@ -198,3 +198,35 @@ def test_place_order_service_success(
     assert event_dispatcher_dummy.read() == [
         DispatchableEvent(order=persisted_order, event_type=expected_event_type)
     ]
+
+
+def test_place_order_service_success(
+    product_version_ids: dict[Identifier, Identifier],
+    requested_order: RequestedOrder,
+    versioned_order: VersionedOrder,
+    persisted_order: PersistedOrder,
+) -> None:
+    get_product_version_ids_dummy = GetProductVersionIdsDummy()
+    save_order_dummy = SaveOrderDummy(persisted_order_to_return=persisted_order)
+    event_dispatcher_dummy = EventDispatcherDummy()
+    status_to_event_mapper_dummy = StatusToEventMapperDummy()
+    service = PlaceOrderService(
+        get_product_version_ids_spi=get_product_version_ids_dummy,
+        save_order_spi=save_order_dummy,
+        event_dispatcher=event_dispatcher_dummy,
+        _event_mapper=status_to_event_mapper_dummy,
+    )
+
+    # Setup:
+    event_type = DispatchableEvent.EventType.CANCELLED
+    expected_event = DispatchableEvent(order=persisted_order, event_type=event_type)
+    status_to_event_mapper_dummy.event_type = event_type
+    get_product_version_ids_dummy.product_version_ids = product_version_ids
+
+    # Run:
+    persisted_order_result = service.place_order(requested_order=requested_order)
+
+    # Asserts:
+    assert persisted_order_result == persisted_order
+    assert save_order_dummy.read() == [versioned_order]
+    assert event_dispatcher_dummy.read() == [expected_event]
