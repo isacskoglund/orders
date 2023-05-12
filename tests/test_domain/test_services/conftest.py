@@ -105,10 +105,10 @@ class OrderDataByOrderIdDummy:
 
 @dataclass
 class OrderDataByCustomerIdDummy:
-    order_data: list[OrderData] = field(default_factory=list)
+    order_data_list: list[OrderData] = field(default_factory=list)
 
     def get_order_data_by_customer_id(self, customer_id: Identifier) -> list[OrderData]:
-        return self.order_data
+        return self.order_data_list
 
 
 @fixture
