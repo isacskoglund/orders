@@ -13,6 +13,9 @@ from pytest import fixture
 from uuid import uuid4, UUID
 from random import choice, randint
 
+MAX_PRICE = 10
+MAX_QTY = 10
+
 
 class IdentifierTest(Identifier):
     id: UUID = uuid4()
@@ -53,6 +56,22 @@ def product_version_ids(
 
 
 @fixture
+def product_versions(
+    product_version_ids: dict[Identifier, Identifier]
+) -> dict[Identifier, ProductVersion]:
+    result: dict[Identifier, ProductVersion] = {}
+    for product_id, product_version_id in product_version_ids.items():
+        result[product_id] = ProductVersion(
+            id=product_version_id,
+            product_id=product_id,
+            price=ProductVersion.Price(
+                amount=randint(1, MAX_PRICE), unit="test_unit", currency="test_currency"
+            ),
+        )
+    return result
+
+
+@fixture
 def requested_items(
     product_version_ids: dict[Identifier, Identifier],
     size: int = 5,
@@ -82,6 +101,21 @@ def versioned_items(
 
 
 @fixture
+def items_with_product_versions(
+    product_version_ids: dict[Identifier, Identifier],
+    product_versions: dict[Identifier, ProductVersion],
+) -> dict[Identifier, ItemWithProductVersion]:
+    result: dict[Identifier, ItemWithProductVersion] = {}
+    for product_id in product_version_ids.keys():
+        result[product_id] = ItemWithProductVersion(
+            product_id=product_id,
+            quantity=randint(1, MAX_QTY),
+            product_version=product_versions[product_id],
+        )
+    return result
+
+
+@fixture
 def persisted_order(
     id_generator: Callable[[], Identifier],
     address: Address,
@@ -96,3 +130,18 @@ def persisted_order(
         shipping_address=address,
     )
     return order
+
+
+@fixture
+def order_data(
+    items_with_product_versions: dict[Identifier, ItemWithProductVersion],
+    persisted_order: PersistedOrder,
+) -> OrderData:
+    order_data = OrderData(
+        customer_id=persisted_order.customer_id,
+        shipping_address=persisted_order.shipping_address,
+        id=persisted_order.id,
+        items=list(items_with_product_versions.values()),
+        status=persisted_order.status,
+    )
+    return order_data
