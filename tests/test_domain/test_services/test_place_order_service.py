@@ -9,7 +9,7 @@ from domain.models.order import (
 )
 from domain.models.event import DispatchableEvent
 from domain.errors import InvalidProductIdError, NoCurrentProductVersionError
-from conftest import (
+from test_domain.dummies import (
     SaveOrderDummy,
     GetProductVersionIdsDummy,
     EventDispatcherDummy,
