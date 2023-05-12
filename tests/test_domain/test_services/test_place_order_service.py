@@ -66,11 +66,15 @@ class TestPlaceOrderService:
         and that the content of the order is correct.
         """
 
+        # Setup:
         invalid_product_id = id_generator()
         dummies.get_product_version_ids_dummy.invalid_ids = {invalid_product_id}
 
+        # Run:
         with pytest.raises(InvalidProductIdError) as error_info:
             service.place_order(requested_order=requested_order)
+
+        # Assert:
         assert error_info.value.product_id == invalid_product_id
         assert dummies.save_order_dummy.is_empty()
         assert dummies.event_dispatcher_dummy.is_empty()
@@ -88,13 +92,17 @@ class TestPlaceOrderService:
         and that the content of the error is correct.
         """
 
+        # Setup:
         product_id_without_product_version_id = id_generator()
         dummies.get_product_version_ids_dummy.ids_without_product_version_id = {
             product_id_without_product_version_id
         }
 
+        # Run:
         with pytest.raises(NoCurrentProductVersionError) as error_info:
             service.place_order(requested_order=requested_order)
+
+        # Assert:
         assert error_info.value.product_id == product_id_without_product_version_id
         assert dummies.save_order_dummy.is_empty()
         assert dummies.event_dispatcher_dummy.is_empty()
@@ -112,7 +120,7 @@ class TestPlaceOrderService:
         Assert that saving to persistence, dispatching events
         and returning instance of `PersistedOrder` works as expected.
         """
-
+        # Setup:
         event_type = DispatchableEvent.EventType.CANCELLED
         expected_event = DispatchableEvent(order=persisted_order, event_type=event_type)
         dummies.status_to_event_mapper_dummy.event_type = event_type
@@ -121,7 +129,7 @@ class TestPlaceOrderService:
         # Run:
         persisted_order_result = service.place_order(requested_order=requested_order)
 
-        # Asserts:
+        # Assert:
         assert persisted_order_result == persisted_order
         assert dummies.save_order_dummy.read() == [versioned_order]
         assert dummies.event_dispatcher_dummy.read() == [expected_event]
