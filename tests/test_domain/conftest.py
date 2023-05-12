@@ -100,18 +100,17 @@ def versioned_items(
 
 @fixture
 def items_with_product_versions(
-    product_version_ids: dict[Identifier, Identifier],
+    requested_items: dict[Identifier, Item],
     product_versions: dict[Identifier, ProductVersion],
-    max_item_qty: int = MAX_ITEM_QTY,
 ) -> dict[Identifier, ItemWithProductVersion]:
-    result: dict[Identifier, ItemWithProductVersion] = {}
-    for product_id in product_version_ids.keys():
-        result[product_id] = ItemWithProductVersion(
+    return {
+        product_id: ItemWithProductVersion(
             product_id=product_id,
-            quantity=randint(1, max_item_qty),
+            quantity=item.quantity,
             product_version=product_versions[product_id],
         )
-    return result
+        for product_id, item in requested_items.items()
+    }
 
 
 @fixture
