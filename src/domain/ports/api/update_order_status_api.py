@@ -2,14 +2,7 @@ from abc import ABC, abstractmethod
 from domain.models.identifier import Identifier
 from domain.models.order import PersistedOrder
 from domain.models.order_status import Status
-from enum import Enum, auto
-
-
-class ExpectednessSetting(Enum):
-    REQUIRE_NEXT_UP = auto()
-    REQUIRE_FORSEEN = auto()
-    ALLOW_UNEXPECTED = auto()
-    ALLOW_ABNORMAL = auto()
+from domain.models.status_transition_validator import ExpectednessSetting
 
 
 class UpdateOrderStatusAPI(ABC):
