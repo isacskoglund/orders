@@ -65,7 +65,9 @@ class VersionedOrder(Order):
     def get_product_ids(self) -> list[Identifier]:
         return [item.product_id for item in self.items]
 
-    def to_persisted_order(self, id: Identifier, status: Status | None = None):
+    def to_persisted_order(
+        self, id: Identifier, status: Status | None = None
+    ) -> PersistedOrder:
         create_persisted_order = partial(
             PersistedOrder,
             customer_id=self.customer_id,
