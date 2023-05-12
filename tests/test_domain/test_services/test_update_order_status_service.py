@@ -100,18 +100,9 @@ def service(service_dependencies: ServiceDependencies) -> UpdateOrderStatusServi
 
 def test_update_order_status_invalid_order_id(
     id_generator: Callable[[], Identifier],
+    service_dependencies: ServiceDependencies,
+    service: UpdateOrderStatusService,
 ) -> None:
-    # Setup:
-    update_order_dummy = UpdateOrderDummy()
-    get_order_by_id_dummy = GetOrderByOrderIdDummy()
-    event_dispatcher_dummy = EventDispatcherDummy()
-    transition_validator_dummy = TransitionValidatorDummy()
-    service = UpdateOrderStatusService(
-        update_order_spi=update_order_dummy,
-        get_order_by_order_id_spi=get_order_by_id_dummy,
-        status_update_event_dispatcher_spi=event_dispatcher_dummy,
-        _transition_validator=transition_validator_dummy,
-    )
     order_id = id_generator()
 
     # Run:
@@ -122,27 +113,19 @@ def test_update_order_status_invalid_order_id(
 
     # Asserts
     assert error_info.value.order_id == order_id
-    assert update_order_dummy.is_empty()
-    assert event_dispatcher_dummy.is_empty()
+    assert service_dependencies.update_order_dummy.is_empty()
+    assert service_dependencies.event_dispatcher_dummy.is_empty()
 
 
 def test_update_order_status_invalid_transition(
     persisted_order: PersistedOrder,
+    service_dependencies: ServiceDependencies,
+    service: UpdateOrderStatusService,
 ) -> None:
-    update_order_dummy = UpdateOrderDummy()
-    get_order_by_id_dummy = GetOrderByOrderIdDummy()
-    event_dispatcher_dummy = EventDispatcherDummy()
-    transition_validator_dummy = TransitionValidatorDummy()
-
-    # Setup:
-    service = UpdateOrderStatusService(
-        update_order_spi=update_order_dummy,
-        get_order_by_order_id_spi=get_order_by_id_dummy,
-        status_update_event_dispatcher_spi=event_dispatcher_dummy,
-        _transition_validator=transition_validator_dummy,
-    )
-    get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
-    transition_validator_dummy.set_invalid()
+    service_dependencies.get_order_by_id_dummy.orders = {
+        persisted_order.id: persisted_order
+    }
+    service_dependencies.transition_validator_dummy.set_invalid()
 
     # Run:
     with pytest.raises(InsufficientExpectednessError):
@@ -151,32 +134,23 @@ def test_update_order_status_invalid_transition(
         )
 
     # Asserts:
-    assert update_order_dummy.is_empty()
-    assert event_dispatcher_dummy.is_empty()
+    assert service_dependencies.update_order_dummy.is_empty()
+    assert service_dependencies.event_dispatcher_dummy.is_empty()
 
 
 def test_update_order_status_success(
     persisted_order: PersistedOrder,
+    service_dependencies: ServiceDependencies,
+    service: UpdateOrderStatusService,
 ) -> None:
-    # Setup:
-    update_order_dummy = UpdateOrderDummy()
-    get_order_by_id_dummy = GetOrderByOrderIdDummy()
-    event_dispatcher_dummy = EventDispatcherDummy()
-    transition_validator_dummy = TransitionValidatorDummy()
-    status_to_event_mapper_dummy = StatusToEventMapperDummy()
-    service = UpdateOrderStatusService(
-        update_order_spi=update_order_dummy,
-        get_order_by_order_id_spi=get_order_by_id_dummy,
-        status_update_event_dispatcher_spi=event_dispatcher_dummy,
-        _status_to_event_mapper=status_to_event_mapper_dummy,
-        _transition_validator=transition_validator_dummy,
-    )
-    get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
-    transition_validator_dummy.set_valid()
+    service_dependencies.get_order_by_id_dummy.orders = {
+        persisted_order.id: persisted_order
+    }
+    service_dependencies.transition_validator_dummy.set_valid()
     new_status = Status.ACCEPTED_BY_INVENTORY
     expected_result = persisted_order.update_status(new_status=new_status)
     expected_event_type = DispatchableEvent.EventType.CANCELLED
-    status_to_event_mapper_dummy.event_type = expected_event_type
+    service_dependencies.status_to_event_mapper_dummy.event_type = expected_event_type
 
     # Run:
     result = service.update_order_status(
@@ -185,7 +159,9 @@ def test_update_order_status_success(
 
     # Asserts:
     assert result == expected_result
-    assert update_order_dummy.read() == {persisted_order.id: new_status}
-    assert event_dispatcher_dummy.read() == [
+    assert service_dependencies.update_order_dummy.read() == {
+        persisted_order.id: new_status
+    }
+    assert service_dependencies.event_dispatcher_dummy.read() == [
         DispatchableEvent(order=expected_result, event_type=expected_event_type)
     ]
