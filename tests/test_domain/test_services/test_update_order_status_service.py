@@ -1,6 +1,6 @@
 from domain.models.identifier import Identifier
 from domain.models.order import PersistedOrder
-from domain.models.order_status import Status, StatusTransitionProtocol
+from domain.models.order_status import Status
 from domain.models.event import DispatchableEvent
 from domain.ports.api.update_order_status_api import ExpectednessSetting
 from domain.services.update_order_status_service import (
@@ -13,62 +13,11 @@ from test_domain.dummies import (
     GetOrderByOrderIdDummy,
     EventDispatcherDummy,
     StatusToEventMapperDummy,
+    TransitionValidatorDummy,
+    TransitionDummy,
 )
-from dataclasses import dataclass
 from typing import Callable
 import pytest
-
-
-@dataclass
-class TransitionDummy(StatusTransitionProtocol):
-    from_status: Status
-    to_status: Status
-    is_abnormal: bool = False
-    is_unexpected: bool = False
-    is_foreseen: bool = False
-    is_next_up: bool = False
-
-    def set_abnormal(self) -> None:
-        self.is_abnormal = True
-        self.is_unexpected = True
-        self.is_foreseen = False
-        self.is_next_up = False
-
-    def set_unexpected(self) -> None:
-        self.is_abnormal = False
-        self.is_unexpected = True
-        self.is_foreseen = False
-        self.is_next_up = False
-
-    def set_foreseen(self) -> None:
-        self.is_abnormal = False
-        self.is_unexpected = False
-        self.is_foreseen = True
-        self.is_next_up = False
-
-    def set_next_up(self) -> None:
-        self.is_abnormal = False
-        self.is_unexpected = False
-        self.is_foreseen = True
-        self.is_next_up = True
-
-
-class TransitionValidatorDummy:
-    is_valid: bool = False
-
-    @classmethod
-    def validate_transition(
-        cls, transition: StatusTransitionProtocol, setting: ExpectednessSetting
-    ) -> bool:
-        return cls.is_valid
-
-    @classmethod
-    def set_valid(cls) -> None:
-        cls.is_valid = True
-
-    @classmethod
-    def set_invalid(cls) -> None:
-        cls.is_valid = False
 
 
 @pytest.fixture
