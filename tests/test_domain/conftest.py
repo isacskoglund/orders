@@ -48,28 +48,25 @@ def address() -> Address:
 
 @fixture
 def product_version_ids(
-    id_generator: Callable[[], Identifier], size: int = 10
+    id_generator: Callable[[], Identifier], item_count: int = ITEM_COUNT
 ) -> dict[Identifier, Identifier]:
-    result: dict[Identifier, Identifier] = {}
-    for _ in range(0, size):
-        result[id_generator()] = id_generator()
-    return result
+    return {id_generator(): id_generator() for _ in range(0, item_count)}
 
 
 @fixture
 def product_versions(
-    product_version_ids: dict[Identifier, Identifier]
+    product_version_ids: dict[Identifier, Identifier], max_price: int = MAX_PRICE
 ) -> dict[Identifier, ProductVersion]:
-    result: dict[Identifier, ProductVersion] = {}
-    for product_id, product_version_id in product_version_ids.items():
-        result[product_id] = ProductVersion(
+    return {
+        product_id: ProductVersion(
             id=product_version_id,
             product_id=product_id,
             price=ProductVersion.Price(
-                amount=randint(1, MAX_PRICE), unit="test_unit", currency="test_currency"
+                amount=randint(1, max_price), unit="test_unit", currency="test_currency"
             ),
         )
-    return result
+        for product_id, product_version_id in product_version_ids.items()
+    }
 
 
 @fixture
