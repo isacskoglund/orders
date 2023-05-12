@@ -46,17 +46,29 @@ def address() -> Address:
     return AddressTest()
 
 
+# PRODUCT VERSION IDS:
+
+
 @fixture
 def product_version_ids(
     id_generator: Callable[[], Identifier], item_count: int = ITEM_COUNT
 ) -> dict[Identifier, Identifier]:
+    """
+    Returns a dict that maps `product_id` to `product_version_id`.
+    """
     return {id_generator(): id_generator() for _ in range(0, item_count)}
+
+
+# PRODUCT VERSIONS:
 
 
 @fixture
 def product_versions(
     product_version_ids: dict[Identifier, Identifier], max_price: int = MAX_PRICE
 ) -> dict[Identifier, ProductVersion]:
+    """
+    Returns a dict that maps `product_version_id` to instances of `ProductVersion`.
+    """
     return {
         product_id: ProductVersion(
             id=product_version_id,
@@ -69,11 +81,17 @@ def product_versions(
     }
 
 
+# ORDER ITEMS:
+
+
 @fixture
 def requested_items(
     product_version_ids: dict[Identifier, Identifier],
     max_item_qty: int = MAX_ITEM_QTY,
 ) -> dict[Identifier, Item]:
+    """
+    Returns dict that maps `product_id` to instances of `Item`.
+    """
     return {
         product_id: Item(product_id=product_id, quantity=randint(1, max_item_qty))
         for product_id in product_version_ids.keys()
@@ -85,6 +103,9 @@ def versioned_items(
     requested_items: dict[Identifier, Item],
     product_version_ids: dict[Identifier, Identifier],
 ) -> dict[Identifier, VersionedItem]:
+    """
+    Returns dict that maps `product_id` to instances of `VersionedItem`. Copies common attributes from `requested_items`.
+    """
     return {
         product_id: VersionedItem(
             product_id=product_id,
@@ -100,6 +121,9 @@ def items_with_product_versions(
     requested_items: dict[Identifier, Item],
     product_versions: dict[Identifier, ProductVersion],
 ) -> dict[Identifier, ItemWithProductVersion]:
+    """
+    Returns dict that maps `product_id` to instances of `ItemWithProductVersion`. Copies common attributes from `requested_items`.
+    """
     return {
         product_id: ItemWithProductVersion(
             product_id=product_id,
@@ -110,12 +134,18 @@ def items_with_product_versions(
     }
 
 
+# ORDERS:
+
+
 @fixture
 def persisted_order(
     id_generator: Callable[[], Identifier],
     address: Address,
     versioned_items: dict[Identifier, VersionedItem],
 ) -> PersistedOrder:
+    """
+    Returns instance of `PersistedOrder`. Randomizes `order_id` and `customer_id`.
+    """
     order_id = id_generator()
     customer_id = id_generator()
     order = PersistedOrder(
@@ -132,6 +162,9 @@ def order_data(
     items_with_product_versions: dict[Identifier, ItemWithProductVersion],
     persisted_order: PersistedOrder,
 ) -> OrderData:
+    """
+    Returns instance of `OrderData`. Copies common attributes from `persisted_order`.
+    """
     order_data = OrderData(
         customer_id=persisted_order.customer_id,
         shipping_address=persisted_order.shipping_address,
