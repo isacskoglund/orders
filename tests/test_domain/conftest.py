@@ -77,11 +77,10 @@ def requested_items(
     product_version_ids: dict[Identifier, Identifier],
     max_item_qty: int = MAX_ITEM_QTY,
 ) -> dict[Identifier, Item]:
-    result: dict[Identifier, Item] = {}
-    for product_id in product_version_ids.keys():
-        item = Item(product_id=product_id, quantity=randint(1, max_item_qty))
-        result[product_id] = item
-    return result
+    return {
+        product_id: Item(product_id=product_id, quantity=randint(1, max_item_qty))
+        for product_id in product_version_ids.keys()
+    }
 
 
 @fixture
