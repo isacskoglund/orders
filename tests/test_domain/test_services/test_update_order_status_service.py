@@ -54,13 +54,17 @@ def test_update_order_status_invalid_order_id(
     dummies: Dummies,
     service: UpdateOrderStatusService,
 ) -> None:
+    """
+    Assert that service raises `InvalidOrderIdError`
+    when persistence returns `None` instead of an order.
+    """
+
+    # Setup
     order_id = id_generator()
 
     # Run:
     with pytest.raises(InvalidOrderIdError) as error_info:
-        service.update_order_status(
-            order_id=order_id, new_status=Status.ACCEPTED_BY_INVENTORY
-        )
+        service.update_order_status(order_id=order_id, new_status=Status.PENDING)
 
     # Asserts
     assert error_info.value.order_id == order_id
@@ -73,6 +77,12 @@ def test_update_order_status_invalid_transition(
     dummies: Dummies,
     service: UpdateOrderStatusService,
 ) -> None:
+    """
+    Assert that service raises `InsufficientExpectednessError`
+    when the transition validator rejects the transition.
+    """
+
+    # Setup
     dummies.get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
     dummies.transition_validator_dummy.set_invalid()
 
@@ -82,7 +92,7 @@ def test_update_order_status_invalid_transition(
             order_id=persisted_order.id, new_status=Status.PENDING
         )
 
-    # Asserts:
+    # Assert:
     assert dummies.update_order_dummy.is_empty()
     assert dummies.event_dispatcher_dummy.is_empty()
 
@@ -92,21 +102,27 @@ def test_update_order_status_success(
     dummies: Dummies,
     service: UpdateOrderStatusService,
 ) -> None:
+    """
+    Assert that updating the order to persistence, dispatching events
+    and returning instance of `PersistedOrder` with new status works as
+    expected.
+    """
+
+    # Setup:
     dummies.get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
     dummies.transition_validator_dummy.set_valid()
     new_status = Status.ACCEPTED_BY_INVENTORY
     expected_result = persisted_order.update_status(new_status=new_status)
-    expected_event_type = DispatchableEvent.EventType.CANCELLED
-    dummies.status_to_event_mapper_dummy.event_type = expected_event_type
+    event_type = DispatchableEvent.EventType.CANCELLED
+    expected_event = DispatchableEvent(order=expected_result, event_type=event_type)
+    dummies.status_to_event_mapper_dummy.event_type = event_type
 
     # Run:
     result = service.update_order_status(
         order_id=persisted_order.id, new_status=new_status
     )
 
-    # Asserts:
+    # Assert:
     assert result == expected_result
     assert dummies.update_order_dummy.read() == {persisted_order.id: new_status}
-    assert dummies.event_dispatcher_dummy.read() == [
-        DispatchableEvent(order=expected_result, event_type=expected_event_type)
-    ]
+    assert dummies.event_dispatcher_dummy.read() == [expected_event]
