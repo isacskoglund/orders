@@ -2,6 +2,7 @@ from typing import Callable
 from domain.models.identifier import Identifier
 from domain.models.order import (
     RequestedOrder,
+    VersionedOrder,
     PersistedOrder,
     OrderData,
     Address,
@@ -156,20 +157,33 @@ def requested_order(
 
 
 @fixture
+def versioned_order(
+    requested_order: RequestedOrder, versioned_items: dict[Identifier, VersionedItem]
+) -> VersionedOrder:
+    """
+    Returns instance of `VersionedOrder`. Copies common attributes from requested_order.
+    """
+    return VersionedOrder(
+        customer_id=requested_order.customer_id,
+        shipping_address=requested_order.shipping_address,
+        items=list(versioned_items.values()),
+    )
+
+
+@fixture
 def persisted_order(
     id_generator: Callable[[], Identifier],
     address: Address,
-    versioned_items: dict[Identifier, VersionedItem],
-    requested_order: RequestedOrder,
+    versioned_order: VersionedOrder,
 ) -> PersistedOrder:
     """
-    Returns instance of `PersistedOrder`. Copies `customer_id` from `requested_order`. Randomizes `order_id`.
+    Returns instance of `PersistedOrder`. Copies `customer_id` and `items` from `versioned_order`. Randomizes `order_id`.
     """
     order_id = id_generator()
     return PersistedOrder(
         id=order_id,
-        customer_id=requested_order.customer_id,
-        items=list(versioned_items.values()),
+        customer_id=versioned_order.customer_id,
+        items=versioned_order.items,
         shipping_address=address,
     )
 
