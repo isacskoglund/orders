@@ -59,14 +59,14 @@ def test_update_order_status_invalid_order_id(
     when persistence returns `None` instead of an order.
     """
 
-    # Setup
+    # Setup:
     order_id = id_generator()
 
     # Run:
     with pytest.raises(InvalidOrderIdError) as error_info:
         service.update_order_status(order_id=order_id, new_status=Status.PENDING)
 
-    # Asserts
+    # Assert:
     assert error_info.value.order_id == order_id
     assert dummies.update_order_dummy.is_empty()
     assert dummies.event_dispatcher_dummy.is_empty()
@@ -82,7 +82,7 @@ def test_update_order_status_invalid_transition(
     when the transition validator rejects the transition.
     """
 
-    # Setup
+    # Setup:
     dummies.get_order_by_id_dummy.orders = {persisted_order.id: persisted_order}
     dummies.transition_validator_dummy.set_invalid()
 
