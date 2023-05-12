@@ -14,7 +14,8 @@ from uuid import uuid4, UUID
 from random import choice, randint
 
 MAX_PRICE = 10
-MAX_QTY = 10
+ITEM_COUNT = 10
+MAX_ITEM_QTY = 10
 
 
 class IdentifierTest(Identifier):
@@ -74,13 +75,13 @@ def product_versions(
 @fixture
 def requested_items(
     product_version_ids: dict[Identifier, Identifier],
-    size: int = 5,
-    max_quantity: int = 10,
+    item_count: int = ITEM_COUNT,
+    max_item_qty: int = MAX_ITEM_QTY,
 ) -> list[Item]:
     result: list[Item] = []
-    for _ in range(0, size):
+    for _ in range(0, item_count):
         product_id = choice(list(product_version_ids.keys()))
-        item = Item(product_id=product_id, quantity=randint(1, max_quantity))
+        item = Item(product_id=product_id, quantity=randint(1, max_item_qty))
         result.append(item)
     return result
 
@@ -104,12 +105,13 @@ def versioned_items(
 def items_with_product_versions(
     product_version_ids: dict[Identifier, Identifier],
     product_versions: dict[Identifier, ProductVersion],
+    max_item_qty: int = MAX_ITEM_QTY,
 ) -> dict[Identifier, ItemWithProductVersion]:
     result: dict[Identifier, ItemWithProductVersion] = {}
     for product_id in product_version_ids.keys():
         result[product_id] = ItemWithProductVersion(
             product_id=product_id,
-            quantity=randint(1, MAX_QTY),
+            quantity=randint(1, MAX_ITEM_QTY),
             product_version=product_versions[product_id],
         )
     return result
