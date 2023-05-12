@@ -124,12 +124,12 @@ def test_transition_validator_is_singleton() -> None:
 
 def test_update_order_status_invalid_order_id(
     id_generator: Callable[[], Identifier],
-    update_order_dummy: UpdateOrderDummy,
-    get_order_by_id_dummy: GetOrderByOrderIdDummy,
-    event_dispatcher_dummy: EventDispatcherDummy,
     transition_validator_dummy: TransitionValidatorDummy,
 ) -> None:
     # Setup:
+    update_order_dummy = UpdateOrderDummy()
+    get_order_by_id_dummy = GetOrderByOrderIdDummy()
+    event_dispatcher_dummy = EventDispatcherDummy()
     service = UpdateOrderStatusService(
         update_order_spi=update_order_dummy,
         get_order_by_order_id_spi=get_order_by_id_dummy,
@@ -152,11 +152,12 @@ def test_update_order_status_invalid_order_id(
 
 def test_update_order_status_invalid_transition(
     persisted_order: PersistedOrder,
-    update_order_dummy: UpdateOrderDummy,
-    get_order_by_id_dummy: GetOrderByOrderIdDummy,
-    event_dispatcher_dummy: EventDispatcherDummy,
     transition_validator_dummy: TransitionValidatorDummy,
 ) -> None:
+    update_order_dummy = UpdateOrderDummy()
+    get_order_by_id_dummy = GetOrderByOrderIdDummy()
+    event_dispatcher_dummy = EventDispatcherDummy()
+
     # Setup:
     service = UpdateOrderStatusService(
         update_order_spi=update_order_dummy,
@@ -180,13 +181,13 @@ def test_update_order_status_invalid_transition(
 
 def test_update_order_status_success(
     persisted_order: PersistedOrder,
-    update_order_dummy: UpdateOrderDummy,
-    get_order_by_id_dummy: GetOrderByOrderIdDummy,
-    event_dispatcher_dummy: EventDispatcherDummy,
     transition_validator_dummy: TransitionValidatorDummy,
-    status_to_event_mapper_dummy: StatusToEventMapperDummy,
 ) -> None:
     # Setup:
+    update_order_dummy = UpdateOrderDummy()
+    get_order_by_id_dummy = GetOrderByOrderIdDummy()
+    event_dispatcher_dummy = EventDispatcherDummy()
+    status_to_event_mapper_dummy = StatusToEventMapperDummy()
     service = UpdateOrderStatusService(
         update_order_spi=update_order_dummy,
         get_order_by_order_id_spi=get_order_by_id_dummy,

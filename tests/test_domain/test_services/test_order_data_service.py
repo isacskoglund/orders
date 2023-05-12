@@ -8,9 +8,8 @@ from conftest import OrderDataByOrderIdDummy, OrderDataByCustomerIdDummy
 import pytest
 
 
-def test_by_order_id_service_invalid_order_id(
-    order_data_by_order_id_dummy: OrderDataByOrderIdDummy, order_data: OrderData
-) -> None:
+def test_by_order_id_service_invalid_order_id(order_data: OrderData) -> None:
+    order_data_by_order_id_dummy = OrderDataByOrderIdDummy()
     service = OrderDataByOrderIdService(order_data_spi=order_data_by_order_id_dummy)
 
     with pytest.raises(InvalidOrderIdError) as error_info:
@@ -19,9 +18,8 @@ def test_by_order_id_service_invalid_order_id(
     assert error_info.value.order_id == order_data.id
 
 
-def test_by_order_id_service_success(
-    order_data_by_order_id_dummy: OrderDataByOrderIdDummy, order_data: OrderData
-) -> None:
+def test_by_order_id_service_success(order_data: OrderData) -> None:
+    order_data_by_order_id_dummy = OrderDataByOrderIdDummy()
     service = OrderDataByOrderIdService(order_data_spi=order_data_by_order_id_dummy)
     order_data_by_order_id_dummy.order_data = order_data
 
@@ -30,9 +28,8 @@ def test_by_order_id_service_success(
     assert result == order_data
 
 
-def test_by_customer_id_service_empty(
-    order_data_by_customer_id_dummy: OrderDataByCustomerIdDummy, order_data: OrderData
-) -> None:
+def test_by_customer_id_service_empty(order_data: OrderData) -> None:
+    order_data_by_customer_id_dummy = OrderDataByCustomerIdDummy()
     service = OrderDataByCustomerIdService(
         order_data_spi=order_data_by_customer_id_dummy
     )
@@ -42,9 +39,8 @@ def test_by_customer_id_service_empty(
     assert result == []
 
 
-def test_by_customer_id_service_success(
-    order_data_by_customer_id_dummy: OrderDataByCustomerIdDummy, order_data: OrderData
-) -> None:
+def test_by_customer_id_service_success(order_data: OrderData) -> None:
+    order_data_by_customer_id_dummy = OrderDataByCustomerIdDummy()
     service = OrderDataByCustomerIdService(
         order_data_spi=order_data_by_customer_id_dummy
     )
