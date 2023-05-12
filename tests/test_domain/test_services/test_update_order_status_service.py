@@ -17,6 +17,7 @@ from test_domain.dummies import (
     TransitionDummy,
 )
 from typing import Callable
+from dataclasses import dataclass
 import pytest
 
 
@@ -64,6 +65,37 @@ def test_transition_validator_is_singleton() -> None:
     validator1 = TransitionValidator()
     validator2 = TransitionValidator()
     assert validator1 is validator2
+
+
+@dataclass
+class ServiceDependencies:
+    update_order_dummy: UpdateOrderDummy
+    get_order_by_id_dummy: GetOrderByOrderIdDummy
+    event_dispatcher_dummy: EventDispatcherDummy
+    transition_validator_dummy: TransitionValidatorDummy
+    status_to_event_mapper_dummy: StatusToEventMapperDummy
+
+
+@pytest.fixture
+def service_dependencies() -> ServiceDependencies:
+    return ServiceDependencies(
+        update_order_dummy=UpdateOrderDummy(),
+        get_order_by_id_dummy=GetOrderByOrderIdDummy(),
+        event_dispatcher_dummy=EventDispatcherDummy(),
+        transition_validator_dummy=TransitionValidatorDummy(),
+        status_to_event_mapper_dummy=StatusToEventMapperDummy(),
+    )
+
+
+@pytest.fixture
+def service(service_dependencies: ServiceDependencies) -> UpdateOrderStatusService:
+    return UpdateOrderStatusService(
+        update_order_spi=service_dependencies.update_order_dummy,
+        get_order_by_order_id_spi=service_dependencies.get_order_by_id_dummy,
+        status_update_event_dispatcher_spi=service_dependencies.event_dispatcher_dummy,
+        _transition_validator=service_dependencies.transition_validator_dummy,
+        _status_to_event_mapper=service_dependencies.status_to_event_mapper_dummy,
+    )
 
 
 def test_update_order_status_invalid_order_id(
