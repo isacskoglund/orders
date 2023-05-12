@@ -1,11 +1,12 @@
 from typing import Callable
 from domain.models.identifier import Identifier
 from domain.models.order import (
+    RequestedOrder,
     PersistedOrder,
+    OrderData,
     Address,
     Item,
     VersionedItem,
-    OrderData,
     ItemWithProductVersion,
 )
 from domain.models.product import ProductVersion
@@ -138,23 +139,39 @@ def items_with_product_versions(
 
 
 @fixture
+def requested_order(
+    id_generator: Callable[[], Identifier],
+    address: Address,
+    requested_items: dict[Identifier, Item],
+) -> RequestedOrder:
+    """
+    Returns instance of `RequestedOrder`. Randomizes `customer_id`.
+    """
+    customer_id = id_generator()
+    return RequestedOrder(
+        customer_id=customer_id,
+        shipping_address=address,
+        items=list(requested_items.values()),
+    )
+
+
+@fixture
 def persisted_order(
     id_generator: Callable[[], Identifier],
     address: Address,
     versioned_items: dict[Identifier, VersionedItem],
+    requested_order: RequestedOrder,
 ) -> PersistedOrder:
     """
-    Returns instance of `PersistedOrder`. Randomizes `order_id` and `customer_id`.
+    Returns instance of `PersistedOrder`. Copies `customer_id` from `requested_order`. Randomizes `order_id`.
     """
     order_id = id_generator()
-    customer_id = id_generator()
-    order = PersistedOrder(
+    return PersistedOrder(
         id=order_id,
-        customer_id=customer_id,
+        customer_id=requested_order.customer_id,
         items=list(versioned_items.values()),
         shipping_address=address,
     )
-    return order
 
 
 @fixture
@@ -165,11 +182,10 @@ def order_data(
     """
     Returns instance of `OrderData`. Copies common attributes from `persisted_order`.
     """
-    order_data = OrderData(
+    return OrderData(
         customer_id=persisted_order.customer_id,
         shipping_address=persisted_order.shipping_address,
         id=persisted_order.id,
         items=list(items_with_product_versions.values()),
         status=persisted_order.status,
     )
-    return order_data
