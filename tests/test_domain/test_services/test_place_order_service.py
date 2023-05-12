@@ -52,52 +52,76 @@ def service(dummies: Dummies) -> PlaceOrderService:
     )
 
 
-def test_place_order_service_raises(
-    id_generator: Callable[[], Identifier],
-    requested_order: RequestedOrder,
-    dummies: Dummies,
-    service: PlaceOrderService,
-) -> None:
-    # Assert raises `InvalidProductIdError` on `invalid_ids` not empty:
-    invalid_product_id = id_generator()
-    dummies.get_product_version_ids_dummy.invalid_ids = {invalid_product_id}
-    with pytest.raises(InvalidProductIdError) as error_info:
-        service.place_order(requested_order=requested_order)
-    assert error_info.value.product_id == invalid_product_id
-    assert dummies.save_order_dummy.is_empty()
-    assert dummies.event_dispatcher_dummy.is_empty()
-    dummies.get_product_version_ids_dummy.invalid_ids = set()
+class TestPlaceOrderService:
+    @staticmethod
+    def test_raise_on_invalid_product_id(
+        id_generator: Callable[[], Identifier],
+        requested_order: RequestedOrder,
+        dummies: Dummies,
+        service: PlaceOrderService,
+    ) -> None:
+        """
+        Assert that service raises `InvalidProductIdError`
+        on `invalid_ids` not empty,
+        and that the content of the order is correct.
+        """
 
-    # Assert raises `NoCurrentProductVersionError` on `ids_without_product_version_id` not empty:
-    product_id_without_product_version_id = id_generator()
-    dummies.get_product_version_ids_dummy.ids_without_product_version_id = {
-        product_id_without_product_version_id
-    }
-    with pytest.raises(NoCurrentProductVersionError) as error_info:
-        service.place_order(requested_order=requested_order)
-    assert error_info.value.product_id == product_id_without_product_version_id
-    assert dummies.save_order_dummy.is_empty()
-    assert dummies.event_dispatcher_dummy.is_empty()
+        invalid_product_id = id_generator()
+        dummies.get_product_version_ids_dummy.invalid_ids = {invalid_product_id}
 
+        with pytest.raises(InvalidProductIdError) as error_info:
+            service.place_order(requested_order=requested_order)
+        assert error_info.value.product_id == invalid_product_id
+        assert dummies.save_order_dummy.is_empty()
+        assert dummies.event_dispatcher_dummy.is_empty()
 
-def test_place_order_service_success(
-    product_version_ids: dict[Identifier, Identifier],
-    requested_order: RequestedOrder,
-    versioned_order: VersionedOrder,
-    persisted_order: PersistedOrder,
-    dummies: Dummies,
-    service: PlaceOrderService,
-) -> None:
-    # Setup:
-    event_type = DispatchableEvent.EventType.CANCELLED
-    expected_event = DispatchableEvent(order=persisted_order, event_type=event_type)
-    dummies.status_to_event_mapper_dummy.event_type = event_type
-    dummies.get_product_version_ids_dummy.product_version_ids = product_version_ids
+    @staticmethod
+    def test_raise_on_product_id_without_current_product_version_id(
+        id_generator: Callable[[], Identifier],
+        requested_order: RequestedOrder,
+        dummies: Dummies,
+        service: PlaceOrderService,
+    ) -> None:
+        """
+        Assert service raises `NoCurrentProductVersionError`
+        on `ids_without_product_version_id` not empty,
+        and that the content of the error is correct.
+        """
 
-    # Run:
-    persisted_order_result = service.place_order(requested_order=requested_order)
+        product_id_without_product_version_id = id_generator()
+        dummies.get_product_version_ids_dummy.ids_without_product_version_id = {
+            product_id_without_product_version_id
+        }
 
-    # Asserts:
-    assert persisted_order_result == persisted_order
-    assert dummies.save_order_dummy.read() == [versioned_order]
-    assert dummies.event_dispatcher_dummy.read() == [expected_event]
+        with pytest.raises(NoCurrentProductVersionError) as error_info:
+            service.place_order(requested_order=requested_order)
+        assert error_info.value.product_id == product_id_without_product_version_id
+        assert dummies.save_order_dummy.is_empty()
+        assert dummies.event_dispatcher_dummy.is_empty()
+
+    @staticmethod
+    def test_place_order_success(
+        product_version_ids: dict[Identifier, Identifier],
+        requested_order: RequestedOrder,
+        versioned_order: VersionedOrder,
+        persisted_order: PersistedOrder,
+        dummies: Dummies,
+        service: PlaceOrderService,
+    ) -> None:
+        """
+        Assert that saving to persistence, dispatching events
+        and returning instance of `PersistedOrder` works as expected.
+        """
+
+        event_type = DispatchableEvent.EventType.CANCELLED
+        expected_event = DispatchableEvent(order=persisted_order, event_type=event_type)
+        dummies.status_to_event_mapper_dummy.event_type = event_type
+        dummies.get_product_version_ids_dummy.product_version_ids = product_version_ids
+
+        # Run:
+        persisted_order_result = service.place_order(requested_order=requested_order)
+
+        # Asserts:
+        assert persisted_order_result == persisted_order
+        assert dummies.save_order_dummy.read() == [versioned_order]
+        assert dummies.event_dispatcher_dummy.read() == [expected_event]
