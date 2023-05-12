@@ -4,8 +4,6 @@ from domain.models.order import (
     RequestedOrder,
     VersionedOrder,
     PersistedOrder,
-    Address,
-    Item,
 )
 from domain.models.event import DispatchableEvent
 from domain.errors import InvalidProductIdError, NoCurrentProductVersionError
