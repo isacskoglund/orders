@@ -1,6 +1,9 @@
 [tool.mypy]
 strict = true
 
+[tool.flake8]
+max-line-length = 88
+
 [tool.pytest.ini_options]
 addopts = "-s"
 pythonpath = "tests"
