@@ -56,7 +56,8 @@ class TransitionToExpectednessMapper(metaclass=SingletonMeta):
         # Assigns each tuple `(from_status, to_status)` to a member of `Expectedness`.
         # Row indices are given by `from_status`.
         # Column indices are given by `to_status`.
-        # Values at each position are keys and relate to a specific member of `Expectedness`.
+        # Values at each position are keys and
+        # relate to a specific member of `Expectedness`.
         #
         # P, A, P, S, D, C
         (0, 3, 2, 2, 2, 1),  # PENDING
@@ -93,7 +94,9 @@ class StatusTransition:
         self,
         from_status: Status,
         to_status: Status,
-        _expectedness_mapper: TransitionToExpectednessProtocol = TransitionToExpectednessMapper,
+        _expectedness_mapper: TransitionToExpectednessProtocol = (
+            TransitionToExpectednessMapper
+        ),
     ) -> None:
         self.from_status = from_status
         self.to_status = to_status
@@ -105,5 +108,8 @@ class StatusTransition:
             Expectedness.ABNORMAL,
             Expectedness.UNEXPECTED,
         }
-        self.is_foreseen = expectedness in {Expectedness.FORESEEN, Expectedness.NEXT_UP}
+        self.is_foreseen = expectedness in {
+            Expectedness.FORESEEN,
+            Expectedness.NEXT_UP,
+        }
         self.is_next_up = expectedness in {Expectedness.NEXT_UP}
