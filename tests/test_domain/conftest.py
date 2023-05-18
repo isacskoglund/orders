@@ -106,7 +106,8 @@ def versioned_items(
     product_version_ids: dict[Identifier, Identifier],
 ) -> dict[Identifier, VersionedItem]:
     """
-    Returns dict that maps `product_id` to instances of `VersionedItem`. Copies common attributes from `requested_items`.
+    Returns dict that maps `product_id` to instances of `VersionedItem`.
+    Copies common attributes from `requested_items`.
     """
     return {
         product_id: VersionedItem(
@@ -124,7 +125,8 @@ def items_with_product_versions(
     product_versions: dict[Identifier, ProductVersion],
 ) -> dict[Identifier, ItemWithProductVersion]:
     """
-    Returns dict that maps `product_id` to instances of `ItemWithProductVersion`. Copies common attributes from `requested_items`.
+    Returns dict that maps `product_id` to instances of `ItemWithProductVersion`.
+    Copies common attributes from `requested_items`.
     """
     return {
         product_id: ItemWithProductVersion(
@@ -177,7 +179,8 @@ def persisted_order(
     versioned_order: VersionedOrder,
 ) -> PersistedOrder:
     """
-    Returns instance of `PersistedOrder`. Copies `customer_id` and `items` from `versioned_order`. Randomizes `order_id`.
+    Returns instance of `PersistedOrder`.
+    Copies `customer_id` and `items` from `versioned_order`. Randomizes `order_id`.
     """
     order_id = id_generator()
     return PersistedOrder(
