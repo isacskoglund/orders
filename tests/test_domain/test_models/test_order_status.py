@@ -22,11 +22,12 @@ def expectedness_mapper_dummy() -> ExpectednessMapperDummy:
 
 
 def test_is_properties(expectedness_mapper_dummy: ExpectednessMapperDummy) -> None:
-    get_transition = lambda: StatusTransition(
-        from_status=Status.PENDING,
-        to_status=Status.ACCEPTED_BY_INVENTORY,
-        _expectedness_mapper=expectedness_mapper_dummy,
-    )
+    def get_transition() -> StatusTransition:
+        return StatusTransition(
+            from_status=Status.PENDING,
+            to_status=Status.ACCEPTED_BY_INVENTORY,
+            _expectedness_mapper=expectedness_mapper_dummy,
+        )
 
     expectedness_mapper_dummy.current_expectedness = Expectedness.ABNORMAL
     transition = get_transition()
