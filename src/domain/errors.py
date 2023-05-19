@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from domain.models.identifier import Identifier
 from domain.models.order import VersionedOrder
+from domain.models.product import Product, ProductVersion
 
 
 class DomainError(Exception):
@@ -17,6 +18,13 @@ class InvalidProductIdError(DomainError):
     """
 
     product_id: Identifier
+
+
+@dataclass(frozen=True)
+class InvalidProductVersionIdError(DomainError):
+    """
+    Could not find product version with the given id.
+    """
 
 
 @dataclass
@@ -76,3 +84,32 @@ class ReadFromPersistenceError(DomainError):
     """
     Could not read from persistence.
     """
+
+
+@dataclass(frozen=True)
+class AddProductError(DomainError):
+    """
+    Could not add the product to the product catalogue.
+    """
+
+    product: Product
+
+
+@dataclass(frozen=True)
+class AddProductVersionError(DomainError):
+    """
+    Could not add the product version to the product catalogue.
+    """
+
+    product_version: ProductVersion
+
+
+@dataclass(frozen=True)
+class SetCurrentProductVersionIdError(DomainError):
+    """
+    Could not set the current product version id
+    of the product with id `product_id`.
+    """
+
+    product_id: Identifier
+    product_version_id: Identifier
