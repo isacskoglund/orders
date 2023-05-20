@@ -4,5 +4,5 @@ setup(
     name="orders",
     version="0.1",
     package_dir={"": "src"},
-    packages=["domain"],
+    packages=["domain", "django_project"],
 )
