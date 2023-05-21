@@ -2,6 +2,7 @@
 **egg-info**
 **.coverage**
 **migrations**
+**db.sqlite3**
 Pipfile
 Pipfile.lock
 todo.md

@@ -6,5 +6,5 @@ max-line-length = 88
 
 [tool.pytest.ini_options]
 addopts = "-s"
-pythonpath = ["tests", "src/django_project"]
-DJANGO_SETTINGS_MODULE = "django_project.project.settings.dev"
+pythonpath = ["tests"]
+DJANGO_SETTINGS_MODULE = "project.settings.dev"
