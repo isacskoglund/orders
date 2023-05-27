@@ -10,7 +10,7 @@ class Currency(models.Model):
     )
     name = models.CharField(max_length=50)
 
-    class Meta:
+    class Meta:  # type: ignore
         db_table = "currency"
 
 
@@ -19,5 +19,5 @@ class PriceABC(models.Model):
     price_currency = models.ForeignKey(to=Currency, on_delete=models.PROTECT)
     price_unit = models.CharField(max_length=50)
 
-    class Meta:
+    class Meta:  # type: ignore
         abstract = True
