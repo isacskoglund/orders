@@ -1,4 +1,23 @@
-from .factories import CustomerFactory
+from .factories import (
+    CustomerFactory,
+    ShippingAddressFactory,
+    ProductFactory,
+    ProductVersionFactory,
+    OrderFactory,
+    LineItemFactory,
+    CurrencyFactory,
+)
 from pytest_factoryboy import register
 
-register(CustomerFactory)
+_factories = (
+    CustomerFactory,
+    ShippingAddressFactory,
+    ProductFactory,
+    ProductVersionFactory,
+    OrderFactory,
+    LineItemFactory,
+    CurrencyFactory,
+)
+
+for factory in _factories:
+    register(factory)
