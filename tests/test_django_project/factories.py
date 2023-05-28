@@ -44,7 +44,21 @@ class ProductFactory(DjangoModelFactory):
         )
 
 
-class ProductVersionFactory(DjangoModelFactory):
+class CurrencyFactory(DjangoModelFactory):
+    class Meta:
+        model = Currency
+
+    code = factory.Faker("currency_code")
+    name = factory.Faker("currency_name")
+
+
+class PriceFactoryABC(DjangoModelFactory):
+    price_amount = factory.Faker("pyint", min_value=1, max_value=1000)
+    price_unit = factory.Faker("pystr", max_chars=50)
+    price_currency = factory.SubFactory(CurrencyFactory)
+
+
+class ProductVersionFactory(PriceFactoryABC):
     class Meta:
         model = ProductVersion
 
@@ -66,11 +80,3 @@ class LineItemFactory(DjangoModelFactory):
 
     order = factory.SubFactory(OrderFactory)
     product_version = factory.SubFactory(ProductVersionFactory)
-
-
-class CurrencyFactory(DjangoModelFactory):
-    class Meta:
-        model = Currency
-
-    code = factory.Faker("currency_code")
-    name = factory.Faker("currency_name")

@@ -1,3 +1,5 @@
+# type: ignore
+
 from tests.test_django_project.factories import CurrencyFactory
 from app.models import Currency
 

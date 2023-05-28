@@ -34,7 +34,7 @@ class Order(models.Model):
         choices=StatusChoices.choices,
     )
     shipping_address = models.OneToOneField(
-        ShippingAddress, on_delete=models.PROTECT, related_name="order"
+        ShippingAddress, on_delete=models.PROTECT, related_name="orders"
     )
 
     class Meta:  # type: ignore
